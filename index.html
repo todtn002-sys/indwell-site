@@ -117,7 +117,8 @@
   .faq summary::after { content: "＋"; color: var(--ink-dim); }
   .faq details[open] summary::after { content: "－"; }
   .faq details p { margin-top: 10px; color: var(--ink-dim); font-size: 15px; max-width: 34em; }
-  .download { text-align: center; }
+  /* 바로 위 '자주 묻는 질문' 구역의 아래 여백과 겹쳐 간격이 너무 벌어져서 위 여백만 줄임 */
+  .download { text-align: center; padding-top: 24px; }
   /* 첫 줄 뒤 빈 줄: 한 줄 높이의 약 절반 */
   .download .gap { display: block; height: .5em; }
   /* 첫 줄은 도입이라 페이지의 흐린 글자색으로 옅게 */
