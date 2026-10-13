@@ -54,7 +54,20 @@
   /* 맨 위 줄. 화면 폭마다 로고 크기를 정해 두어 메뉴와 부딪히지 않게 함:
      600 미만(휴대폰) = 1줄: 로고·앱 받기 / 2줄: 메뉴 3개를 폭 전체에 고르게
      600 이상 = 한 줄: 로고 왼쪽, 메뉴·앱 받기 오른쪽 */
-  html { scroll-behavior: smooth; }
+  /* 따라오는 띠 높이만큼 남겨 두어, 메뉴로 이동했을 때 제목이 띠에 가리지 않게 */
+  html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+  /* 따라오는 메뉴 띠: 맨 위 메뉴가 화면 밖으로 나가면 위에서 내려온다(아래 스크립트가 .show를 붙임).
+     내용은 맨 위 메뉴(.nav-right)를 그대로 복사해 쓰므로 메뉴는 맨 위 한 곳만 고치면 된다.
+     남색 = 앱 아이콘 밤하늘색 */
+  .stickybar { position: fixed; top: 0; left: 0; right: 0; z-index: 20; background: #0E1530; padding-top: env(safe-area-inset-top, 0px); transform: translateY(-100%); visibility: hidden; transition: transform .25s ease, visibility .25s; box-shadow: 0 6px 20px rgba(14,21,48,.25); }
+  .stickybar.show { transform: none; visibility: visible; }
+  .stickybar .wrap { display: flex; justify-content: flex-end; padding-block: 10px; }
+  .stickybar .nav-right { display: flex; align-items: center; gap: 20px; }
+  .stickybar .menu { display: flex; gap: 22px; border: 0; padding: 0; }
+  .stickybar .menu a { color: #EDE3CC; }
+  .stickybar .menu a:hover { color: #FFFFFF; }
+  .stickybar .get { background: var(--oat); color: var(--ink); }
+  @media (prefers-reduced-motion: reduce) { .stickybar { transition: none; } }
   .topbar .wrap { display: grid; grid-template-columns: auto 1fr auto; grid-template-areas: "brand . get" "menu menu menu"; align-items: center; gap: 14px 24px; padding-block: 20px 0; }
   .brand { grid-area: brand; margin: 0; line-height: 0; }
   /* 로고 = 같은 줄의 남은 폭을 꽉 채우는 크기(가로:세로 3.485).
@@ -188,6 +201,23 @@
     </div>
   </div>
 </nav>
+<!-- 따라오는 메뉴 띠 — 내용은 아래 스크립트가 맨 위 메뉴를 복사해 채운다 -->
+<div class="stickybar" aria-hidden="true"><div class="wrap"></div></div>
+<script>
+  // 맨 위 메뉴를 띠에 복사하고, 맨 위 메뉴가 화면 밖으로 나가면 띠를 보여 준다.
+  // 이 스크립트는 '사용법' 창 스크립트보다 앞에 있어야 복사된 '사용법'도 창을 연다.
+  (function () {
+    var bar = document.querySelector('.stickybar');
+    var top = document.querySelector('.topbar');
+    bar.firstElementChild.appendChild(top.querySelector('.nav-right').cloneNode(true));
+    function setShown(on) {
+      bar.classList.toggle('show', on);
+      bar.setAttribute('aria-hidden', on ? 'false' : 'true');
+      bar.querySelectorAll('a').forEach(function (a) { a.tabIndex = on ? 0 : -1; });
+    }
+    new IntersectionObserver(function (es) { setShown(!es[0].isIntersecting); }).observe(top);
+  })();
+</script>
 <header class="hero">
   <div class="wrap">
     <div>
