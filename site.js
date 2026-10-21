@@ -107,6 +107,14 @@ var inkReady = (function () {
       pts: (p ? el.dataset.quadP : el.dataset.quad).trim().split(/\s+/).map(function (s) { return s.split(',').map(Number); }) };
   }
   function d(a, b) { return Math.hypot(a[0] - b[0], a[1] - b[1]); }
+  // 그림판 안에서 그림이 실제로 그려진 자리. 틀과 그림 비율이 다르면(휴대폰 장면 틀) 그림이 잘려 보이므로(object-fit: cover)
+  // 그림의 % 좌표를 그림판 좌표로 옮길 때 잘린 만큼을 뺀다. 잘리는 중심은 그림의 object-position(index.html --focus)
+  function drawn(plate, iw, ih, W, H) {
+    var img = plate.querySelector(':scope > picture > img'), pos = [50, 50];
+    if (img) pos = getComputedStyle(img).objectPosition.split(' ').map(function (v) { return v.indexOf('%') > 0 ? parseFloat(v) : 50; });
+    var k = Math.max(W / iw, H / ih), dw = iw * k, dh = ih * k;
+    return { x: (W - dw) * pos[0] / 100, y: (H - dh) * pos[1] / 100, w: dw, h: dh };
+  }
   function layout(el) {
     var plate = el.closest('.plate'), W = plate.clientWidth, H = plate.clientHeight;
     if (!W || !H) return;
@@ -123,15 +131,133 @@ var inkReady = (function () {
       while ((el.scrollHeight > el.clientHeight + 1 || el.scrollWidth > el.clientWidth + 1) && fs > 10) { fs -= 1; el.style.fontSize = fs + 'px'; }
       }
     }
-    el.style.transform = homography(BOX, parseFloat(el.style.height), q.pts.map(function (v) { return [v[0] / 100 * W, v[1] / 100 * H]; }));
+    var r = drawn(plate, q.iw, q.ih, W, H);
+    el.style.transform = homography(BOX, parseFloat(el.style.height), q.pts.map(function (v) { return [r.x + v[0] / 100 * r.w, r.y + v[1] / 100 * r.h]; }));
   }
-  function layoutAll() { els.forEach(layout); }
+  // 휴대폰 장면 틀: 설명 글(.frame-note·.caption)을 그림 안 '주인공 아래 여백의 가운데'에 놓는다.
+  // 자리 = figure의 data-note-y(그림 높이의 %, 휴대폰에 보이는 판 기준 — 세로판이 있으면 세로판). 그림이 잘려 보이는 만큼은 drawn()으로 보정
+  var notes = [].slice.call(document.querySelectorAll('.seq .frame')).filter(function (f) { return f.querySelector(':scope > .frame-note, :scope > .caption'); });
+  function placeNote(f) {
+    var targets = f.querySelectorAll(':scope > .frame-note, :scope > .caption'), plate = f.querySelector('.plate');
+    if (!PORTRAIT.matches || !document.documentElement.classList.contains('motion')) { targets.forEach(function (t) { t.style.top = ''; }); return; }
+    var W = plate.clientWidth, H = plate.clientHeight, p = f.classList.contains('has-p');
+    if (!W || !H) return;
+    var r = drawn(plate, p ? 1024 : 1536, p ? 1536 : 1024, W, H);
+    var y = Math.min(H * .96, r.y + (+(f.dataset.noteY || 92)) / 100 * r.h);
+    targets.forEach(function (t) { t.style.top = y.toFixed(1) + 'px'; });
+  }
+  // ── 설명 글 색: 그 뒤 배경 밝기에 맞춰, 그 순간 읽히는 색으로(윤곽 없음) ──
+  // 1) 장면 묶음마다 그림 한 장 한 장을 그림판 크기로 그려 픽셀을 한 번 받아 둔다(seq._px[i]).
+  // 2) 설명 글(.frame-note)은 글자(.ch)마다, 시각 표시(.caption)는 통째로 한 덩어리로 뒤 밝기를 잰다(u._L[i]).
+  // 3) 스크롤마다 겹친 비율(--in)대로 섞는다. 문장 전체 평균으로 먹색 쪽/아이보리 쪽을 한 번 정하고(한 문장 안에서 뒤집히지 않게),
+  //    글자는 문장 평균에서 35%만 벗어나게 + 이웃 ±2와 평균 내 부드럽게. 그 쪽 안에서 가장 잘 읽히는 색을 고르고,
+  //    대비 4.5:1이 남으면 중간 톤 쪽으로 차분하게 당긴다.
+  //    figure에 data-note-band가 있으면 글 뒤에 옅은 오트밀 띠(site.css)를 깔고 계산에도 넣는다.
+  var LIN = []; for (var li = 0; li < 256; li++) { var c = li / 255; LIN[li] = c <= .04045 ? c / 12.92 : Math.pow((c + .055) / 1.055, 2.4); }
+  function contrast(a, b) { return (Math.max(a, b) + .05) / (Math.min(a, b) + .05); }
+  var INK = [59, 42, 32], IVORY = [246, 238, 228], STEPS = [];
+  var BAND_A = .32, BAND_L = .2126 * LIN[239] + .7152 * LIN[227] + .0722 * LIN[214];   // 옅은 띠: site.css의 data-note-band 띠와 같은 값
+  for (var si = 0; si <= 20; si++) {
+    var col = INK.map(function (v, k) { return Math.round(v + (IVORY[k] - v) * si / 20); });
+    STEPS.push({ css: 'rgb(' + col.join(',') + ')', L: .2126 * LIN[col[0]] + .7152 * LIN[col[1]] + .0722 * LIN[col[2]] });
+  }
+  function noteTargets(f) { return f.querySelectorAll(':scope > .frame-note, :scope > .caption'); }
+  function phoneMotion() { return PORTRAIT.matches && document.documentElement.classList.contains('motion'); }
+  function measureSeq(seq) {
+    var frames = [].slice.call(seq.querySelectorAll(':scope > .seq-stick > .frame')), plate0 = frames[0] && frames[0].querySelector('.plate');
+    if (!plate0) return;
+    var W = plate0.clientWidth, H = plate0.clientHeight, S = .5;
+    if (!W || !H) return;
+    seq._px = frames.map(function (f) {
+      var img = f.querySelector('.plate > picture > img');
+      if (!img || !img.complete || !img.naturalWidth) {
+        if (img) img.addEventListener('load', function () { measureSeq(seq); paintNotes(); }, { once: true });
+        return null;
+      }
+      try {
+        var cv = document.createElement('canvas'); cv.width = Math.ceil(W * S); cv.height = Math.ceil(H * S);
+        var cx = cv.getContext('2d'), r = drawn(f.querySelector('.plate'), img.naturalWidth, img.naturalHeight, W, H);
+        cx.scale(S, S); cx.drawImage(img, r.x, r.y, r.w, r.h);
+        return { d: cx.getImageData(0, 0, cv.width, cv.height).data, w: cv.width, h: cv.height };
+      } catch (e) { return null; }
+    });
+    var pr = plate0.getBoundingClientRect();
+    seq._chars = [];
+    frames.forEach(function (f) {
+      noteTargets(f).forEach(function (t) {
+        var keep = t.style.translate; t.style.translate = '0px 0px';   // 나타나기 움직임(조금 내려가 있음)을 빼고 제자리에서 잰다
+        var list = t.classList.contains('caption') ? [t] : [].slice.call(t.querySelectorAll('.ch'));
+        list.band = f.hasAttribute('data-note-band') ? BAND_A : 0;
+        list.forEach(function (ch) {
+          var b = ch.getBoundingClientRect(), x0 = (b.left - pr.left) * S, y0 = (b.top - pr.top) * S, x1 = (b.right - pr.left) * S, y1 = (b.bottom - pr.top) * S;
+          ch._L = seq._px.map(function (px) {
+            if (!px) return null;
+            var L = [];
+            for (var y = Math.max(0, Math.floor(y0)); y < Math.min(px.h, Math.ceil(y1)); y++)
+              for (var x = Math.max(0, Math.floor(x0)); x < Math.min(px.w, Math.ceil(x1)); x++) {
+                var i = (y * px.w + x) * 4; L.push(.2126 * LIN[px.d[i]] + .7152 * LIN[px.d[i + 1]] + .0722 * LIN[px.d[i + 2]]);
+              }
+            if (!L.length) return null;
+            L.sort(function (a, b2) { return a - b2; });
+            return { lo: L[Math.floor(L.length * .1)], hi: L[Math.floor(L.length * .9)] };
+          });
+        });
+        t.style.translate = keep;
+        seq._chars.push(list);
+      });
+    });
+  }
+  function paintNotes() {
+    if (!phoneMotion()) return;
+    var vh = innerHeight;
+    document.querySelectorAll('.seq').forEach(function (seq) {
+      if (!seq._chars) return;
+      var r = seq.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > vh) return;   // 화면 밖 묶음은 칠하지 않음
+      var ins = [].slice.call(seq.querySelectorAll(':scope > .seq-stick > .frame')).map(function (f, i) { return i === 0 ? 1 : +(f.style.getPropertyValue('--in') || 0); });
+      seq._chars.forEach(function (list) {
+        var bg = list.map(function (ch) {   // 겹친 그림을 아래부터 차례로 덮어 지금 이 글자 뒤 밝기를 만든다
+          var lo = null, hi = null;
+          (ch._L || []).forEach(function (m, i) { if (!m) return; if (lo === null) { lo = m.lo; hi = m.hi; } else { lo += (m.lo - lo) * ins[i]; hi += (m.hi - hi) * ins[i]; } });
+          return lo === null ? null : [lo, hi];
+        });
+        var sumLo = 0, sumHi = 0, cnt = 0;
+        bg.forEach(function (v) { if (v) { sumLo += v[0]; sumHi += v[1]; cnt++; } });
+        if (!cnt) return;
+        var aLo = sumLo / cnt, aHi = sumHi / cnt;
+        function band(v) { return v + (BAND_L - v) * list.band; }
+        var dark = contrast(STEPS[0].L, band(aLo)) >= contrast(STEPS[20].L, band(aHi));   // 문장 전체로 한 번 정한다
+        var k0 = dark ? 0 : 10, k1 = dark ? 10 : 20;
+        list.forEach(function (ch, i) {
+          var lo = 0, hi = 0, n = 0;
+          for (var j = Math.max(0, i - 2); j <= Math.min(list.length - 1, i + 2); j++) if (bg[j]) { lo += bg[j][0]; hi += bg[j][1]; n++; }
+          if (!n) return;
+          lo = band(aLo + (lo / n - aLo) * .35); hi = band(aHi + (hi / n - aHi) * .35);
+          var best = k0, bestS = -1, score = [];
+          for (var k = k0; k <= k1; k++) { score[k] = Math.min(contrast(STEPS[k].L, lo), contrast(STEPS[k].L, hi)); if (score[k] > bestS) { bestS = score[k]; best = k; } }
+          var pick = best;   // 대비가 넉넉하면 같은 쪽에서 중간 톤에 가장 가까운 색으로(튀지 않게)
+          if (bestS > 4.5) { var dir = best < 10 ? 1 : -1; for (var m = best; m !== 10 && score[m + dir] >= 4.5; m += dir) pick = m + dir; }
+          var css = STEPS[pick].css;
+          if (ch._c !== css) { ch._c = css; ch.style.color = css; }
+        });
+      });
+    });
+  }
+  function clearNotes() {
+    document.querySelectorAll('.seq .ch, .seq .caption').forEach(function (ch) { if (ch._c) { ch._c = null; ch.style.color = ''; } });
+  }
+  function layoutAll() {
+    els.forEach(layout); notes.forEach(placeNote);
+    if (phoneMotion()) { document.querySelectorAll('.seq').forEach(measureSeq); paintNotes(); } else clearNotes();
+  }
   var fontsIn = document.fonts ? Promise.all([document.fonts.load('400 30px "Nanum Pen Script"', '가나다'), document.fonts.load('600 30px "Noto Serif KR"', '가나다')]) : Promise.resolve();
   var wait = new Promise(function (r) { setTimeout(r, 3000); });   // 서체를 못 받아도 3초 뒤에는 대체 서체로 그린다
   return Promise.race([fontsIn, wait]).catch(function () {}).then(function () {
     texts.forEach(handwrite);
+    notes.forEach(function (f) { f.querySelectorAll(':scope > .frame-note').forEach(function (t) { if (!t._split) { t._split = true; splitChars(t); } }); });   // 설명 글만 글자별 색을 칠하려고 나눔(시각 표시는 통째로 한 색)
     layoutAll();
     document.documentElement.classList.add('ov-ready');
+    onScroll(paintNotes);   // 장면 묶음이 --in을 바꾼 다음 차례에 돈다(등록 순서)
     var queued = false;
     function relayout() { if (!queued) { queued = true; requestAnimationFrame(function () { queued = false; layoutAll(); }); } }
     addEventListener('resize', relayout);
@@ -161,13 +287,15 @@ var inkReady = (function () {
   var bar = document.querySelector('.timebar');
   var links = [].slice.call(bar.querySelectorAll('a'));
   var targets = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
-  var hero = document.querySelector('.hero'), foot = document.querySelector('footer'), night = document.getElementById('s5');
+  var hero = document.querySelector('.hero'), foot = document.querySelector('footer'), night = document.getElementById('s5'), sticky = document.querySelector('.stickybar');
   onScroll(function () {
     var vh = innerHeight, cur = -1;
     targets.forEach(function (t, i) { if (t.getBoundingClientRect().top <= vh * .5) cur = i; });
     links.forEach(function (a, i) { if (i === cur) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
     bar.classList.toggle('show', hero.getBoundingClientRect().bottom < vh * .55 && foot.getBoundingClientRect().top > vh - 40);
-    bar.classList.toggle('dark', night.getBoundingClientRect().top < vh * .5);
+    var dark = night.getBoundingClientRect().top < vh * .5;   // 밤 장면 이후: 시간 버튼·메뉴 띠가 함께 바뀐다(판단은 여기 한 곳)
+    bar.classList.toggle('dark', dark);
+    sticky.classList.toggle('dark', dark);
   });
 })();
 
@@ -242,10 +370,10 @@ if (MOTION) (function () {
 
 // ── 밤이 내려앉는다: 장면 5(21:00)의 윗변이 화면 아래 85% → 25% 자리로 올라오는 동안 화면 전체가 남색으로 ──
 if (MOTION) (function () {
-  var veil = document.querySelector('.nightfall'), night = document.getElementById('s5');
+  var root = document.documentElement, night = document.getElementById('s5');
   onScroll(function () {
     var o = ease((innerHeight * .85 - night.getBoundingClientRect().top) / (innerHeight * .6));
-    veil.style.setProperty('--night-o', Math.round(o * 1000) / 1000);
+    root.style.setProperty('--night-o', Math.round(o * 1000) / 1000);   // 밤 막(.nightfall)과 바탕(body)이 함께 읽는다
   });
 })();
 

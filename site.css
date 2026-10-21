@@ -53,6 +53,12 @@ html { scroll-behavior: smooth; scroll-padding-top: 72px; }
 .stickybar .menu a { color: var(--night-ink); }
 .stickybar .menu a:hover { color: #FFFFFF; }
 .stickybar .get { background: var(--oat); color: var(--ink); }
+/* 밤 장면(남색 바탕)에서는 반대로 밝은 띠 — 밝은 바탕엔 남색, 남색 바탕엔 오트밀(site.js가 시간 버튼과 같은 때 .dark를 붙임) */
+.stickybar { transition: transform .25s ease, visibility .25s, background .5s ease; }
+.stickybar.dark { background: var(--oat); box-shadow: 0 6px 20px rgba(0,0,0,.35); }
+.stickybar.dark .menu a { color: var(--ink-dim); }
+.stickybar.dark .menu a:hover { color: var(--ink); }
+.stickybar.dark .get { background: var(--night); color: var(--night-ink); }
 @media (prefers-reduced-motion: reduce) { .stickybar { transition: none; } }
 /* 맨 위 줄. 화면 폭마다 로고 크기를 정해 두어 메뉴와 부딪히지 않게 함:
    600 미만(휴대폰) = 1줄: 로고·앱 받기 / 2줄: 메뉴
@@ -93,12 +99,11 @@ html { scroll-behavior: smooth; scroll-padding-top: 72px; }
 .plate { position: relative; margin-inline: auto; overflow: hidden; container-type: inline-size; background: var(--card);
   width: min(100%, 1536px, calc((100svh - 48px) * 1.5)); aspect-ratio: 3 / 2; }
 .plate picture { position: absolute; inset: 0; display: block; }   /* 그림 틀도 그림판 크기로 — 그래야 빛 쓸기·다가가기 효과가 그림에 걸린다 */
-.plate img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.plate img { position: absolute; inset: 0; width: 100%; height: 100%; display: block;
+  object-fit: cover; object-position: var(--focus, 50% 50%); }   /* 틀과 그림 비율이 다를 때(휴대폰 장면 틀)만 잘린다. 잘릴 때 남길 중심 = 그림별 --focus(index.html) */
 .caption { margin: 10px auto 0; width: min(100%, 1536px, calc((100svh - 48px) * 1.5)); font-family: var(--latin); font-size: 13px; letter-spacing: .08em; color: var(--ink-dim); }
 .frame-note { margin: 14px auto 0; width: min(100%, 1536px, calc((100svh - 48px) * 1.5)); color: var(--ink-dim); max-width: 34em; }
 
-/* 그림 위에 얹는 글: --x·--y = 왼쪽 위 자리(그림판 폭·높이의 %), --w = 폭(%), --fs = 글자 크기(그림판 폭의 %),
-   --tf = 기울기·원근(종이 결에 맞춤). 값은 frame마다 아래 '그림별 자리'에서 정한다. */
 /* 그림 속 종이에 손으로 쓴 글. 자리·기울기·원근·글자 크기는 site.js가 정한다(여기서는 필기구별 잉크만).
    잉크는 종이 색과 곱해져(multiply) 종이 결·나뭇잎 그림자가 글자 위로 비친다 — 종이에 스민 것처럼 */
 .ov { position: absolute; left: 0; top: 0; box-sizing: border-box; transform-origin: 0 0; visibility: hidden; pointer-events: none;
@@ -151,6 +156,9 @@ html.ov-ready .pasted { visibility: visible; }
 .pillar .limit { font-size: 13px; letter-spacing: .04em; color: var(--gold); }
 .pillar p { color: var(--ink-dim); font-size: 15px; }
 .flow-note { margin-top: 24px; color: var(--ink-dim); font-size: 15px; max-width: 34em; }
+/* 세 가지 글 아래의 두 번째 묶음(일기·독후감): 같은 칸 모양, 위에 여백과 작은 제목 */
+.pillars-title { font-family: var(--title); font-weight: 400; font-size: clamp(22px, 5vw, 28px); margin-top: 88px; }
+.pillars-title + .pillars { margin-top: 28px; }
 
 /* ── 실제 앱 화면(휴대폰 틀) ─────────────────────────── */
 /* 틀만 그리고 화면은 실제 앱을 찍은 그림 그대로(1206×2622) */
@@ -245,14 +253,9 @@ footer .mail { user-select: all; color: var(--ink); }
   .hero .stores { margin-top: 18px; gap: 8px; }
   .hero .store { padding: 9px 14px; font-size: 13px; }
   /* 그림 아래 글: 화면 가장자리에 붙지 않게 양옆 여백 */
-  .caption, .frame-note, .mobile-text { padding-inline: 20px; }
-  /* 단상 전문은 휴대폰 가로 그림 위에서 너무 작아지므로 그림 아래 글로 보여 준다 */
-  .f-postit-paper .ov.body { display: none; }
-  .f-postit-paper .mobile-text { display: block; }
+  .caption, .frame-note { padding-inline: 20px; }
   .statement-text { width: 80%; font-size: 6cqw; }
 }
-.mobile-text { display: none; margin: 18px auto 0; width: min(100%, 34em); font-family: var(--title); line-height: 1.85; }
-.mobile-text p + p { margin-top: .9em; }
 /* 휴대폰 세로에서 가로 그림의 그림판은 폭에 맞춘다(세로 화면 높이 기준 계산이 폭보다 커지지 않게) */
 @media (orientation: portrait) {
   .plate, .caption, .frame-note { width: min(100%, 1536px); }
@@ -273,6 +276,7 @@ footer .mail { user-select: all; color: var(--ink); }
   .split .privacy-list { margin-top: 0; }
   .gallery img { width: 230px; }
   .pillars { grid-template-columns: repeat(3, 1fr); }
+  .pillars.two { grid-template-columns: repeat(2, 1fr); max-width: calc(2 / 3 * 100%); }   /* 두 칸은 위 세 칸과 같은 폭으로 */
   .pillar { padding: 36px 32px; border-bottom: 0; }
   .pillar + .pillar { border-left: 1px solid var(--rule); }
 }
@@ -300,7 +304,7 @@ html.motion { scroll-behavior: auto; }   /* 부드러운 이동은 site.js가 �
 /* ↑ 아래 64 = 시간 단추 자리. 그림들을 위쪽 기준으로 맞춘다 — 장마다 아래 글 길이가 달라도 겹치는 그림이 같은 자리에 놓이게 */
 .motion .seq .frame { grid-area: 1 / 1; margin: 0; width: 100%; pointer-events: none; }   /* --txt는 그림 아래 글에 남길 높이(그림판 크기 계산에만 씀) */
 .motion .seq .frame[data-active] { pointer-events: auto; }
-.motion .seq .plate, .motion .seq .caption, .motion .seq .frame-note, .motion .seq .mobile-text {
+.motion .seq .plate, .motion .seq .caption, .motion .seq .frame-note {
   width: min(100%, 1536px, calc((100svh - var(--bar) - var(--txt) - 96px) * 1.5)); }
 /* 새 그림이 덮여 올 때: 그림판 전체(그림+그 위 글)가 아주 조금 다가오며 자리를 잡는다 */
 .motion .seq .plate { scale: calc(1 + (1 - var(--in, 1)) * .03); }
@@ -309,7 +313,7 @@ html.motion { scroll-behavior: auto; }   /* 부드러운 이동은 site.js가 �
 .motion .seq .plate { background: transparent; }
 .motion .seq .statement .plate::after { opacity: var(--in, 1); }
 /* 글은 자기 그림이 앞에 있을 때만 보이고, 살짝 떠오르며 나타난다 */
-.motion .seq .frame :is(.ov, .pasted, .caption, .frame-note, .toast, .mobile-text, .statement-text, .hero-copy) {
+.motion .seq .frame :is(.ov, .pasted, .caption, .frame-note, .toast, .statement-text, .hero-copy) {
   opacity: var(--a, 1); translate: 0 calc((1 - var(--a, 1)) * 14px); }
 .motion .seq .frame .plate::before { opacity: var(--a, 1); }   /* 첫 화면 글 뒤의 옅은 막도 글과 함께 */
 /* 첫 화면 → 펜촉: 종이와 펜 쪽으로 천천히 다가간다 */
@@ -322,6 +326,10 @@ html.motion { scroll-behavior: auto; }   /* 부드러운 이동은 site.js가 �
 /* ── 밤이 내려앉는다: 장면 5에 가까워질수록 화면 전체가 남색으로 ── */
 .nightfall { position: fixed; inset: 0; z-index: -1; background: var(--night); opacity: 0; pointer-events: none; }
 .motion .nightfall { opacity: var(--night-o, 0); }
+/* 아이폰 사파리의 아래 주소창 뒤는 고정 막(.nightfall)이 덮지 못하고 페이지 바탕이 비친다 → 바탕색도 같은 값으로 섞는다(--night-o는 site.js가 <html>에 붙임) */
+.motion body { background: color-mix(in srgb, var(--night) calc(var(--night-o, 0) * 100%), var(--oat)); }
+/* 아이폰 사파리는 아래 주소창 뒤를 고정된 바탕 그림(.paper-bg)의 색으로 칠한다 → 밤에는 종이 결 바탕도 함께 걷어 낸다 */
+.motion .paper-bg { opacity: calc(1 - var(--night-o, 0)); }
 .motion .night { background: transparent; }
 .motion footer.is-night { color: #B9AE9C; border-top-color: rgba(237,227,204,.14); }
 .motion footer.is-night .mail { color: var(--night-ink); }
@@ -374,13 +382,63 @@ html.motion { scroll-behavior: auto; }   /* 부드러운 이동은 site.js가 �
 .motion .pillars.in .emblem text { opacity: 1; }
 
 @media (max-width: 700px) and (orientation: portrait) {
-  :root { --txt: 150px; }
   .timebar { font-size: 12px; letter-spacing: .02em; }
   .timebar a { padding: 5px 8px; }
-  /* 휴대폰 세로판(2:3) 그림판은 높이 기준으로 */
-  .motion .seq .has-p :is(.plate, .caption, .frame-note) { width: min(100%, calc((100svh - var(--bar) - var(--txt) - 96px) * 2 / 3)); }
-  /* 단상 전문을 그림 아래 글로 보여 주는 장만 글 자리를 넉넉히(가로 그림이라 그림 크기는 그대로) */
-  .motion .f-postit-paper { --txt: 330px; }
+  /* 휴대폰 장면 틀: 한 묶음 안의 그림이 세로판·가로판 섞여도 모두 같은 틀(화면 폭 × 남는 높이)에 꽉 차게.
+     모양이 다르면 겹칠 때 넓은 그림이 비어져 나오고 긴 그림이 아래로 빠진다(2026-10-22 아이폰에서 확인).
+     위 = 따라오는 메뉴 띠(61px) + 아이폰 상태 표시줄(safe-area). 아래는 화면 끝까지 그림으로 채운다 —
+     높이를 100lvh(주소창이 접혔을 때의 큰 화면)로 잡아야 주소창이 접혀도 그림 아래에 빈 띠가 생기지 않는다.
+     (100dvh는 스크롤 중 주소창이 접힐 때마다 높이가 바뀌어 그림이 출렁이므로 쓰지 않는다) */
+  .motion .seq { height: calc(100lvh + (var(--n, 1) - 1) * 85svh); }
+  .motion .seq-stick { height: 100lvh; padding: calc(61px + env(safe-area-inset-top, 0px) + 6px) 0 calc(max(18px, env(safe-area-inset-bottom, 0px)) + 64px + (100lvh - 100svh));
+    grid-template: 1fr / 1fr; align-items: center; justify-items: stretch; }
+  .motion .seq .frame { position: relative; }
+  /* 틀 모양 = 세로판과 같은 2:3(세로판 그림은 잘리지 않고, 가로 그림만 --focus 중심으로 잘린다). 화면이 짧으면 높이에 맞춰 조금 잘린다.
+     높이 상한 = 주소창이 펼쳐진 화면(svh)에서 메뉴 띠·시간 버튼을 뺀 자리 */
+  .motion .seq .plate { width: 100%; height: auto; aspect-ratio: 2 / 3;
+    max-height: calc(100svh - 61px - env(safe-area-inset-top, 0px) - 6px - max(18px, env(safe-area-inset-bottom, 0px)) - 64px); }
+  /* 설명 글은 그림 안, 종이(주인공) 아래 나무 여백의 가운데에 얹는다 — 자리(top)는 site.js가 figure의 data-note-y로 정한다.
+     바탕 띠·윤곽 없이, 글자마다 그 뒤 배경 밝기에 맞는 색을 site.js가 칠한다(.ch 하나하나의 color) */
+  .motion .seq :is(.caption, .frame-note) { position: absolute; left: 0; right: 0; width: auto; max-width: none; margin: 0; padding: 0 20px;
+    transform: translateY(-50%); text-shadow: none; background: none; }
+  .motion .seq .frame-note { font-size: 17px; line-height: 1.6; }
+  /* 배경이 밝고 결이 많은 장면만(figure의 data-note-band) 글 뒤에 옅은 오트밀 띠 — 진하기 .32는 site.js BAND_A와 같게 */
+  .motion .seq [data-note-band] > :is(.caption, .frame-note) { padding-block: 22px;
+    background: linear-gradient(180deg, rgba(239,227,214,0), rgba(239,227,214,.32) 30%, rgba(239,227,214,.32) 70%, rgba(239,227,214,0)); }
+  /* 시각 표시(07:00 · 책상)는 숫자·글자를 한 색으로(영문 숫자 서체도 같은 색을 물려받게) */
+  .motion .seq .caption * { color: inherit; }
+  .motion .seq .caption { font-size: 14px; }
+  .motion .seq .frame:has(.frame-note) .caption { display: none; }   /* 한 장에 둘 다 있으면 설명 글만(같은 자리에 겹치지 않게) */
+  .motion .seq .toast { top: 16px; bottom: auto; }   /* 그림 아래쪽은 설명 글 자리라 앱 안내 쪽지는 위로 */
+}
+/* 높이가 낮은 가로 화면(휴대폰 가로): 넓은 화면 규칙은 그림 아래 글 자리(--txt)를 먼저 떼어 그림이 엄지손톱만 해진다(10-22 아이폰 가로에서 확인).
+   → 그림은 메뉴 띠와 시간 버튼 사이 높이를 다 쓰고, 설명 글은 그림 오른쪽 빈자리에 나란히(가로 화면은 옆이 넓다) */
+@media (orientation: landscape) and (max-height: 560px) {
+  :root { --plate-w: min(100vw - 340px, calc((100svh - 61px - 50px - 10px) * 1.5)); }
+  .timebar { font-size: 11px; letter-spacing: .02em; bottom: 6px; }
+  .timebar a { padding: 4px 9px; }
+  .motion .seq-stick { padding: calc(61px + 5px) 0 50px; align-items: center; }
+  .motion .seq .frame { display: grid; grid-template-columns: var(--plate-w) minmax(0, 250px); column-gap: 28px; justify-content: center; align-items: center; }
+  .motion .seq .plate { width: var(--plate-w); margin: 0; grid-column: 1; grid-row: 1 / span 2; }
+  .motion .seq :is(.caption, .frame-note) { grid-column: 2; grid-row: 1 / span 2; align-self: center; width: auto; max-width: none; margin: 0; padding: 0; }
+  .motion .seq .frame-note { font-size: 15px; line-height: 1.6; color: var(--ink); }
+  .motion .night .seq .frame-note { color: var(--night-ink); }
+  .motion .seq .frame:has(.frame-note) .caption { display: none; }
+  .phone { width: 160px; }   /* 앱 화면 틀은 지나가며 보는 크기로 */
+  /* 설명 글이 없는 묶음(첫 화면·독후감·일기·마무리)은 그림만 가운데 한 칸으로 — 묶음 안 그림들은 겹치며 바뀌므로
+     모두 같은 배치여야 자리가 맞는다. 짧은 시각 표시(07:00 · 책상 등)는 이 화면에서는 숨긴다 */
+  .motion .seq:not(:has(.frame-note)) .frame { grid-template-columns: var(--plate-w); }
+  .motion .seq:not(:has(.frame-note)) .caption { display: none; }
+  /* 첫 화면 글: 작아진 그림 안에 들어가게 */
+  .hero-copy { width: 50%; left: 5%; }
+  .hero .meaning .word { font-size: 20px; }
+  .hero .meaning { font-size: 12px; }
+  .hero .line { margin-block: 10px; }
+  .hero .lead { font-size: 13px; line-height: 1.6; }
+  .hero .stores { margin-top: 12px; gap: 6px; }
+  .hero .store { padding: 6px 11px; font-size: 11px; }
+  .hero .store svg { width: 13px; height: 13px; }
+  .statement-text { font-size: 4.6cqw; }
 }
 @media (prefers-reduced-motion: reduce) {
   .timebar, .timebar a { transition: none; }
