@@ -140,6 +140,20 @@ var inkReady = (function () {
   });
 })();
 
+// ── 장면 그림 미리 받기 ──
+// 장면 묶음(.seq)의 그림들은 한자리에 겹쳐 있다가 차례로 드러나므로, '보일 때 받기(lazy)'로 두면 빠르게 스크롤할 때
+// 다음 그림이 늦게 떠 빈 화면이 비친다. 묶음이 화면 2장 거리 안으로 다가오면 그 안의 그림을 모두 미리 받는다.
+(function () {
+  var near = new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      e.target.querySelectorAll('img[loading="lazy"]').forEach(function (img) { img.loading = 'eager'; });
+      near.unobserve(e.target);
+    });
+  }, { rootMargin: '200% 0px' });
+  document.querySelectorAll('.seq').forEach(function (el) { near.observe(el); });
+})();
+
 // ── 하루 시간 단추 ──
 // 첫 화면을 지나면 아래에 떠오르고, 화면 가운데를 지난 마지막 장면의 시각에 불이 들어온다. 맨 아래(footer)에서는 숨는다.
 // (움직임 줄이기 설정에서도 길잡이로 쓰인다)
