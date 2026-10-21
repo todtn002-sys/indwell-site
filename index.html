@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Indwell — 당신의 세계를 쓰고, 그 안에 머무는 곳</title>
+<!-- ★ 이 파일의 문구를 고치면 'python3 tools/build-fonts.py'를 다시 실행할 것(제목 서체에 새 글자를 넣기 위해).
+     그림을 바꾸면 'swift tools/build-images.swift'. site.css·site.js를 고치면 아래 ?v= 날짜도 바꿀 것. -->
 <!-- 탭 아이콘: 로고 오른쪽의 아치+별 -->
 <link rel="icon" type="image/png" href="img/favicon-64.png">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -22,172 +24,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Noto+Serif+KR:wght@400;500;600&display=swap">
-<style>
-  :root {
-    --oat: #EFE3D6;      /* 앱 책상 기본 배경 '오트밀 아이보리' 평균색 */
-    --gold: #9A6B2A;     /* 오트밀 위에서 읽히는 짙은 금빛 */
-    --ink: #3B2A20;
-    --ink-dim: #75604F;
-    --rule: #D6C6B2;
-    --card: #F6EEE4;
-    --serif: "Noto Serif KR", "AppleMyungjo", "Nanum Myeongjo", serif;
-    --latin: "Cormorant Garamond", "Noto Serif KR", Georgia, serif;
-    --wrap: 1080px;
-  }
-  /* 종이 결 바탕: 이어 붙이지 않은 한 장짜리 그림을 화면에 고정(스크롤해도 반복 없음).
-     넓은 화면 = 5120×2880, 세로 화면(휴대폰) = 1600×2880 */
-  .paper-bg { position: fixed; inset: 0; z-index: -1; background: var(--oat) url(img/oatmeal-wide.jpg) center / cover no-repeat; }
-  @media (orientation: portrait) { .paper-bg { background-image: url(img/oatmeal-tall.jpg); } }
-  /* 기본 여백 없애기·그림이 화면 폭을 넘지 않게 */
-  *, *::before, *::after { box-sizing: border-box; }
-  img { max-width: 100%; }
-  body { margin: 0; background: var(--oat); color: var(--ink); font-family: var(--serif); font-size: 16px; line-height: 1.8; word-break: keep-all; }
-  .wrap { max-width: var(--wrap); margin-inline: auto; padding-inline: 20px; }
-  h1, h2, h3 { font-weight: 500; text-wrap: balance; margin: 0; }
-  p { margin: 0; }
-  a { color: inherit; }
-  a:focus-visible, button:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
-
-  /* 위: 밤하늘 영역 (앱 아이콘 세계) */
-  .hero { color: var(--ink); }
-  .hero .wrap { display: grid; gap: 40px; padding-block: 56px 64px; align-items: center; }
-  /* 맨 위 줄. 화면 폭마다 로고 크기를 정해 두어 메뉴와 부딪히지 않게 함:
-     600 미만(휴대폰) = 1줄: 로고·앱 받기 / 2줄: 메뉴 3개를 폭 전체에 고르게
-     600 이상 = 한 줄: 로고 왼쪽, 메뉴·앱 받기 오른쪽 */
-  /* 따라오는 띠 높이만큼 남겨 두어, 메뉴로 이동했을 때 제목이 띠에 가리지 않게 */
-  html { scroll-behavior: smooth; scroll-padding-top: 72px; }
-  /* 따라오는 메뉴 띠: 맨 위 메뉴가 화면 밖으로 나가면 위에서 내려온다(아래 스크립트가 .show를 붙임).
-     내용은 맨 위 메뉴(.nav-right)를 그대로 복사해 쓰므로 메뉴는 맨 위 한 곳만 고치면 된다.
-     남색 = 앱 아이콘 밤하늘색 */
-  .stickybar { position: fixed; top: 0; left: 0; right: 0; z-index: 20; background: #0E1530; padding-top: env(safe-area-inset-top, 0px); transform: translateY(-100%); visibility: hidden; transition: transform .25s ease, visibility .25s; box-shadow: 0 6px 20px rgba(14,21,48,.25); }
-  .stickybar.show { transform: none; visibility: visible; }
-  .stickybar .wrap { display: flex; justify-content: flex-end; padding-block: 10px; }
-  .stickybar .nav-right { display: flex; align-items: center; gap: 20px; }
-  .stickybar .menu { display: flex; gap: 22px; border: 0; padding: 0; }
-  .stickybar .menu a { color: #EDE3CC; }
-  .stickybar .menu a:hover { color: #FFFFFF; }
-  .stickybar .get { background: var(--oat); color: var(--ink); }
-  @media (prefers-reduced-motion: reduce) { .stickybar { transition: none; } }
-  .topbar .wrap { display: grid; grid-template-columns: auto 1fr auto; grid-template-areas: "brand . get" "menu menu menu"; align-items: center; gap: 14px 24px; padding-block: 20px 0; }
-  .brand { grid-area: brand; margin: 0; line-height: 0; }
-  /* 로고 = 같은 줄의 남은 폭을 꽉 채우는 크기(가로:세로 3.485).
-     실측(10-10): 메뉴 3개 213(600~820)·233(820 이상), 앱 받기 77, 칸 사이 24×2.
-     계산식의 빼는 값 = 여백 40 + 칸 사이 48 + 메뉴·버튼 폭 + 안전 여유 36(스크롤바·글꼴 차이 대비).
-     메뉴 글자나 버튼을 바꾸면 이 숫자도 다시 재야 한다.
-     원본 1812×520 — 가장 클 때도 원본보다 작게 표시되어 큰 화면에서 선명 */
-  .brand img { height: max(40px, calc((100vw - 201px) / 3.485)); width: auto; }
-  .nav-right { display: contents; }
-  .menu { grid-area: menu; display: flex; justify-content: flex-end; gap: 22px; font-size: 15px; border-top: 1px solid var(--rule); padding-top: 8px; }
-  .get { grid-area: get; }
-  .menu a { text-decoration: none; color: var(--ink-dim); padding-block: 4px; }
-  .menu a:hover { color: var(--ink); }
-  .get { white-space: nowrap; text-decoration: none; font-size: 14px; font-weight: 600; color: var(--card); background: var(--ink); padding: 8px 16px; border-radius: 999px; }
-  .hero .meaning { display: flex; align-items: baseline; gap: 12px; font-size: 15px; color: var(--ink-dim); letter-spacing: .04em; }
-  .hero .meaning .word { font-family: var(--latin); font-size: 30px; font-weight: 600; color: var(--gold); letter-spacing: .02em; }
-  .hero .line { width: 48px; height: 1px; background: var(--gold); opacity: .6; margin-block: 28px; }
-  .hero .lead { font-size: clamp(19px, 4.6vw, 24px); line-height: 1.7; }
-  .stores { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px; }
-  .store { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: 999px; font-size: 15px; text-decoration: none; border: 1px solid var(--gold); }
-  .store.primary { background: var(--ink); border-color: var(--ink); color: var(--card); font-weight: 600; }
-  .store.soon { color: var(--ink-dim); border-color: var(--rule); cursor: default; }
-  .store svg { width: 18px; height: 18px; fill: currentColor; }
-  /* 원본 512px — 고화질 화면에서도 선명하도록 표시 폭 340 이하 */
-  .hero-art { justify-self: center; width: min(100%, 340px); }
-  .hero-art img { display: block; width: 100%; border-radius: 28px; box-shadow: 0 24px 60px rgba(59,42,32,.28); }
-
-  /* 아래: 종이 영역 (앱 화면 세계) */
-  section { padding-block: 72px; }
-  .eyebrow { font-size: 13px; letter-spacing: .14em; color: var(--ink-dim); }
-  .intro p.big { font-size: clamp(22px, 5.4vw, 32px); line-height: 1.6; max-width: 22em; }
-  .intro p.body { margin-top: 24px; max-width: 34em; color: var(--ink-dim); }
-  .intro strong { color: var(--ink); font-weight: 500; }
-
-  h2 { font-size: clamp(24px, 5.6vw, 32px); line-height: 1.45; margin-top: 10px; }
-  .flow { display: grid; gap: 0; margin-top: 40px; border-top: 1px solid var(--rule); }
-  .step { display: grid; grid-template-columns: 5.5em 1fr; gap: 16px; padding-block: 24px; border-bottom: 1px solid var(--rule); }
-  .step h3 { font-size: 20px; }
-  .step .limit { font-size: 13px; color: var(--ink-dim); display: block; margin-top: 2px; }
-  .step p { color: var(--ink); }
-  .flow-note { margin-top: 20px; color: var(--ink-dim); font-size: 15px; max-width: 34em; }
-
-  .gallery { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; padding-block: 8px 20px; margin-top: 36px; scrollbar-width: thin; }
-  .gallery img { flex: 0 0 auto; width: min(62vw, 240px); aspect-ratio: 9 / 16; object-fit: cover; border-radius: 14px; scroll-snap-align: start; box-shadow: 0 8px 24px rgba(59,42,32,.12); background: var(--card); }
-  .hint { font-size: 13px; color: var(--ink-dim); margin-top: 4px; }
-
-  .returned .time { font-family: var(--latin); font-size: clamp(72px, 18vw, 120px); color: var(--gold); line-height: 1; margin-top: 18px; font-variant-numeric: tabular-nums; }
-  .returned p { max-width: 32em; margin-top: 20px; }
-  .returned p.dim { color: var(--ink-dim); font-size: 15px; }
-
-  .privacy-list { list-style: none; padding: 0; margin: 36px 0 0; display: grid; gap: 0; border-top: 1px solid var(--rule); }
-  .privacy-list li { padding-block: 20px; border-bottom: 1px solid var(--rule); display: grid; gap: 4px; }
-  .privacy-list b { font-weight: 600; font-size: 17px; }
-  .privacy-list span { color: var(--ink-dim); font-size: 15px; }
-
-  .faq { border-top: 1px solid var(--rule); }
-  .faq details { border-bottom: 1px solid var(--rule); padding-block: 18px; }
-  .faq summary { cursor: pointer; font-size: 17px; font-weight: 500; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
-  .faq summary::-webkit-details-marker { display: none; }
-  .faq summary::after { content: "＋"; color: var(--ink-dim); }
-  .faq details[open] summary::after { content: "－"; }
-  .faq details p { margin-top: 10px; color: var(--ink-dim); font-size: 15px; max-width: 34em; }
-  /* 바로 위 '자주 묻는 질문' 구역의 아래 여백과 겹쳐 간격이 너무 벌어져서 위 여백만 줄임 */
-  .download { text-align: center; padding-top: 24px; }
-  /* 첫 줄 뒤 빈 줄: 한 줄 높이의 약 절반 */
-  .download .gap { display: block; height: .5em; }
-  /* 첫 줄은 도입이라 페이지의 흐린 글자색으로 옅게 */
-  .download .lead-in { color: var(--ink-dim); }
-  .download .stores { justify-content: center; }
-  /* 사용 설명서 창 — 앱 설명서 카드와 같은 위계(장 제목·소제목·본문·왼쪽 선 강조문) */
-  .guide { width: min(720px, 100% - 24px); max-width: none; max-height: min(88vh, 100% - 24px); padding: 0; border: 1px solid var(--rule); border-radius: 18px; background: var(--card); color: var(--ink); box-shadow: 0 30px 80px rgba(59,42,32,.25); overflow: hidden; }
-  .guide[open] { display: flex; flex-direction: column; }
-  .guide::backdrop { background: rgba(59,42,32,.35); }
-  .g-bar { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid var(--rule); font-size: 15px; color: var(--ink-dim); }
-  .g-close { border: 0; background: none; font-size: 18px; color: var(--ink); cursor: pointer; padding: 4px 8px; }
-  .g-body { overflow-y: auto; padding: 28px clamp(20px, 5vw, 48px) 48px; font-size: 16px; line-height: 1.85; }
-  .g-head { text-align: center; padding-bottom: 12px; }
-  .g-head img { height: 40px; width: auto; }
-  .g-sub { margin-top: 10px; font-size: 16px; }
-  .g-cap { font-size: 13px; color: var(--ink-dim); }
-  .g-h { font-size: 20px; font-weight: 600; margin-top: 44px; margin-bottom: 4px; }
-  .g-s { font-size: 16px; font-weight: 600; margin: 18px 0 0; }
-  .g-p { margin-top: 12px; }
-  .g-p strong, .g-em strong { font-weight: 600; }
-  .g-em { margin-top: 16px; padding-left: 14px; border-left: 3px solid #8D6E63; font-weight: 600; }
-  .g-rule { border: 0; border-top: 1px solid var(--rule); margin: 36px 0 8px; }
-  .g-end { display: block; height: 32px; width: auto; margin: 28px auto 0; }
-  footer { border-top: 1px solid var(--rule); padding-block: 40px 56px; font-size: 14px; color: var(--ink-dim); }
-  footer .wrap { display: grid; gap: 20px; justify-items: center; text-align: center; }
-  footer nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 24px; }
-  footer .mail { user-select: all; color: var(--ink); }
-  .copy { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; }
-  /* 원본 1812×520 → 604×173 사본, 표시 높이 28 (고화질 화면 대비 여유) */
-  .logo { height: 28px; width: auto; }
-
-  @media (min-width: 600px) {
-    .topbar .wrap { grid-template-areas: "brand menu get"; }
-    .brand img { height: calc((100vw - 414px) / 3.485); }
-    .menu { justify-content: flex-end; gap: 22px; border-top: 0; padding-top: 0; }
-  }
-  /* 컴퓨터 화면: 옆으로 펼치기 */
-  @media (min-width: 820px) {
-    .topbar .wrap { padding-block: 36px 0; }
-    .brand img { height: calc((min(100vw, 1080px) - 434px) / 3.485); }
-    .menu { gap: 32px; }
-    .hero .wrap { grid-template-columns: 1.15fr 1fr; padding-block: 72px 96px; }
-    section { padding-block: 104px; }
-    .split { display: grid; grid-template-columns: 1fr 1.4fr; gap: 64px; align-items: start; }
-    .split .flow, .split .privacy-list { margin-top: 0; }
-    .step { grid-template-columns: 7em 1fr; }
-    .gallery img { width: 230px; }
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .store { transition: transform .2s ease; }
-    .store.primary:hover { transform: translateY(-2px); }
-  }
-</style>
+<link rel="preload" href="fonts/indwell-title-regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="site.css?v=20261021i">
+<script src="site.js?v=20261021i" defer></script>
+<!-- 움직임을 쓸지 정하는 단 한 곳: 기기의 '움직임 줄이기'가 꺼져 있을 때만 .motion을 붙인다.
+     그림이 그려지기 전에 정해야 멈춘 화면이 잠깐 보였다 바뀌는 깜빡임이 없다. 나머지 판단은 모두 이 표시를 따른다 -->
+<script>if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('motion');</script>
 </head>
 <body>
 <div class="paper-bg" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
 <nav class="topbar" id="top" aria-label="주 메뉴">
   <div class="wrap">
     <h1 class="brand"><a href="#top"><img src="img/logo-lg.png" alt="Indwell"></a></h1>
@@ -201,67 +47,318 @@
     </div>
   </div>
 </nav>
-<!-- 따라오는 메뉴 띠 — 내용은 아래 스크립트가 맨 위 메뉴를 복사해 채운다 -->
+<!-- 따라오는 메뉴 띠 — 내용은 site.js가 맨 위 메뉴를 복사해 채운다 -->
 <div class="stickybar" aria-hidden="true"><div class="wrap"></div></div>
-<script>
-  // 맨 위 메뉴를 띠에 복사하고, 맨 위 메뉴가 화면 밖으로 나가면 띠를 보여 준다.
-  // 이 스크립트는 '사용법' 창 스크립트보다 앞에 있어야 복사된 '사용법'도 창을 연다.
-  (function () {
-    var bar = document.querySelector('.stickybar');
-    var top = document.querySelector('.topbar');
-    bar.firstElementChild.appendChild(top.querySelector('.nav-right').cloneNode(true));
-    function setShown(on) {
-      bar.classList.toggle('show', on);
-      bar.setAttribute('aria-hidden', on ? 'false' : 'true');
-      bar.querySelectorAll('a').forEach(function (a) { a.tabIndex = on ? 0 : -1; });
-    }
-    new IntersectionObserver(function (es) { setShown(!es[0].isIntersecting); }).observe(top);
-  })();
-</script>
+<!-- 밤이 내려앉는 막: 장면 5(21:00)에 가까워질수록 site.js가 짙게 한다(움직임을 줄인 화면에서는 쓰지 않음) -->
+<div class="nightfall" aria-hidden="true"></div>
+<!-- 하루 시간 단추: 지금 보고 있는 장면의 시각에 불이 들어오고, 누르면 그 장면으로 간다 -->
+<nav class="timebar" aria-label="하루의 장면">
+  <a href="#s1">07:00</a>
+  <a href="#how">10:00</a>
+  <a href="#s3">15:00</a>
+  <a href="#s4">19:00</a>
+  <a href="#s5">21:00</a>
+  <a href="#download">23:00</a>
+</nav>
+
+<!-- 그림 고르기 규칙(모든 장면 공통):
+     휴대폰 세로(폭 700 이하·세로 방향)이고 세로판이 있으면 세로판(-p), 아니면 가로 그림(960·1536 중 화면에 맞는 것).
+     AVIF를 못 읽는 옛 브라우저는 <img>의 JPEG를 쓴다.
+     이 조건(max-width: 700px and orientation: portrait)은 site.css의 휴대폰 세로 규칙과 같아야 한다. -->
+
+<!-- ── 장면 1 · 07:00 생각이 나타나다 ── -->
 <header class="hero">
-  <div class="wrap">
-    <div>
-      <p class="meaning"><span class="word">Indwell</span>‘안에 머물다’</p>
-      <div class="line"></div>
-      <p class="lead">당신의 생각이 길이 되고,<br>걸어온 만큼 한 권의 세상이 쌓여 갑니다.</p>
-      <div class="stores">
-        <a class="store primary" href="https://apps.apple.com/app/id6810987473" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.4 12.6c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.8-1.6 0-3.1 1-4 2.4-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.2-.8s1.9.8 3.2.8c1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8 0 0-2.6-1-2.6-3.9zM14 5.5c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.6 2.8-1.4z"/></svg>
-          App Store에서 받기
-        </a>
-        <span class="store soon" aria-disabled="true">Google Play · 곧 출시</span>
+<div class="seq" id="s1"><div class="seq-stick">
+  <figure class="frame f-paper-morning has-p" data-fx="zoom">
+    <div class="plate">
+      <picture>
+        <source media="(max-width: 700px) and (orientation: portrait)" type="image/avif" srcset="img/scenes/08-paper-morning-p-1024.avif">
+        <source media="(max-width: 700px) and (orientation: portrait)" srcset="img/scenes/08-paper-morning-p.jpg">
+        <source type="image/avif" srcset="img/scenes/01-paper-morning-960.avif 960w, img/scenes/01-paper-morning-1536.avif 1536w" sizes="(min-width: 1600px) 1536px, 100vw">
+        <img src="img/scenes/01-paper-morning.jpg" width="1536" height="1024" alt="아침 햇살이 드는 원목 책상 위의 빈 종이와 남색 만년필" fetchpriority="high">
+      </picture>
+      <div class="ov" aria-hidden="true" data-ink><p>높은 가치를 지닌 것일수록 천천히 성숙한다.</p></div>
+      <div class="hero-copy">
+        <p class="meaning"><span class="word">Indwell</span>‘안에 머물다’</p>
+        <div class="line"></div>
+        <p class="lead">당신의 생각이 길이 되고,<br>걸어온 만큼 한 권의 세상이 쌓여 갑니다.</p>
+        <div class="stores">
+          <a class="store primary" href="https://apps.apple.com/app/id6810987473" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.4 12.6c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.8-1.6 0-3.1 1-4 2.4-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.2-.8s1.9.8 3.2.8c1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8 0 0-2.6-1-2.6-3.9zM14 5.5c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.6 2.8-1.4z"/></svg>
+            App Store에서 받기
+          </a>
+          <span class="store soon" aria-disabled="true">Google Play · 곧 출시</span>
+        </div>
       </div>
     </div>
-    <div class="hero-art"><img src="img/hero.jpg" alt="금빛 만년필 끝에서 시작된 길이 열린 문 너머로 이어지는 Indwell 그림"></div>
-  </div>
+    <figcaption class="caption">07:00 · 책상</figcaption>
+  </figure>
+  <figure class="frame statement">
+    <div class="plate">
+      <picture>
+        <source type="image/avif" srcset="img/scenes/09-nib-960.avif 960w, img/scenes/09-nib-1536.avif 1536w" sizes="(min-width: 1600px) 1536px, 100vw">
+        <img src="img/scenes/09-nib.jpg" width="1536" height="1024" alt="크림색 종이에 막 닿은 금빛 펜촉과 번지기 시작한 잉크 한 점" loading="lazy" decoding="async">
+      </picture>
+      <p class="statement-text">생각이 지나가는 자리,<br>그리고 남는 자리.</p>
+    </div>
+  </figure>
+</div></div>
 </header>
 
 <main>
+  <!-- ── 왜 Indwell인가 · 세 가지 글 ── -->
   <section class="intro">
     <div class="wrap">
       <p class="eyebrow">왜 Indwell인가</p>
-      <p class="big" style="margin-top:14px">하루 중 너무나 많은 것을 읽지만,<br>정작 내 생각은 남지 않는 시대.</p>
+      <p class="big" data-reveal>하루 중 너무나 많은 것을 읽지만,<br>정작 내 생각은 남지 않는 시대.</p>
       <p class="body">Indwell은 그 반대편에 있는 공간입니다. 다른 사람의 생각을 소비하는 곳이 아니라, <strong>자신의 생각을 붙잡고, 붙들고, 시간이 지나 다시 만나는 곳</strong>입니다.</p>
-    </div>
-  </section>
-
-  <section id="how" style="padding-top:0">
-    <div class="wrap split">
-      <div>
-        <p class="eyebrow">세 종류의 글</p>
-        <h2>생각이 머무는 시간만큼<br>글이 자랍니다</h2>
-      </div>
-      <div>
-        <div class="flow">
-          <div class="step"><h3>포스트잇<span class="limit">최대 300자</span></h3><p>지금 막 지나가는 생각. 제목도 필요 없습니다. 책상에 붙여 두고 다시 볼 만한 생각인지 지켜봅니다.</p></div>
-          <div class="step"><h3>단상<span class="limit">약 4.5만 자</span></h3><p>조금 더 붙들어 보고 싶은 하나의 생각. 아직 끝나지 않았다면 열어 둘 수 있습니다.</p></div>
-          <div class="step"><h3>책<span class="limit">장 수 제한 없음</span></h3><p>여러 생각이 하나의 흐름으로 이어지는 곳. 여러 장의 목차를 가지며, 책에는 ‘완료’가 없습니다.</p></div>
+      <div class="pillars" data-enter>
+        <div class="pillar">
+          <svg class="emblem" viewBox="0 0 120 120" aria-hidden="true"><defs><path pathLength="1" id="arc-a" d="M18 60 A42 42 0 0 1 102 60"/></defs><circle pathLength="1" cx="60" cy="60" r="56" fill="none" stroke="currentColor" stroke-width=".8"/><circle pathLength="1" cx="60" cy="60" r="34" fill="none" stroke="currentColor" stroke-width=".6"/><text font-family="Cormorant Garamond, serif" font-size="9.5" letter-spacing="2.2" fill="currentColor"><textPath href="#arc-a" startOffset="50%" text-anchor="middle">POST-IT · 300</textPath></text><rect pathLength="1" x="48" y="50" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1" transform="rotate(-6 60 62)"/><path pathLength="1" d="M53 58h13M53 63h10" stroke="currentColor" stroke-width=".8" transform="rotate(-6 60 62)"/></svg>
+          <span class="limit">최대 300자</span>
+          <h3>포스트잇</h3>
+          <p>지금 막 지나가는 생각. 제목도 필요 없습니다. 책상에 붙여 두고 다시 볼 만한 생각인지 지켜봅니다.</p>
         </div>
-        <p class="flow-note">반드시 이 순서대로 쓸 필요는 없습니다. 중요한 것은 글의 길이가 아니라 생각이 머무는 시간입니다.</p>
+        <div class="pillar">
+          <svg class="emblem" viewBox="0 0 120 120" aria-hidden="true"><defs><path pathLength="1" id="arc-b" d="M18 60 A42 42 0 0 1 102 60"/></defs><circle pathLength="1" cx="60" cy="60" r="56" fill="none" stroke="currentColor" stroke-width=".8"/><circle pathLength="1" cx="60" cy="60" r="34" fill="none" stroke="currentColor" stroke-width=".6"/><text font-family="Cormorant Garamond, serif" font-size="9.5" letter-spacing="2.2" fill="currentColor"><textPath href="#arc-b" startOffset="50%" text-anchor="middle">FRAGMENT · 45,000</textPath></text><rect pathLength="1" x="51" y="47" width="20" height="27" fill="none" stroke="currentColor" stroke-width=".8"/><rect pathLength="1" x="48" y="50" width="20" height="27" fill="var(--oat)" stroke="currentColor" stroke-width="1"/><path pathLength="1" d="M52 57h12M52 61h12M52 65h8" stroke="currentColor" stroke-width=".7"/></svg>
+          <span class="limit">약 4.5만 자</span>
+          <h3>단상</h3>
+          <p>조금 더 붙들어 보고 싶은 하나의 생각. 아직 끝나지 않았다면 열어 둘 수 있습니다.</p>
+        </div>
+        <div class="pillar">
+          <svg class="emblem" viewBox="0 0 120 120" aria-hidden="true"><defs><path pathLength="1" id="arc-c" d="M18 60 A42 42 0 0 1 102 60"/></defs><circle pathLength="1" cx="60" cy="60" r="56" fill="none" stroke="currentColor" stroke-width=".8"/><circle pathLength="1" cx="60" cy="60" r="34" fill="none" stroke="currentColor" stroke-width=".6"/><text font-family="Cormorant Garamond, serif" font-size="9.5" letter-spacing="2.2" fill="currentColor"><textPath href="#arc-c" startOffset="50%" text-anchor="middle">BOOK · ∞</textPath></text><path pathLength="1" d="M60 52c-5-3-11-3-15-1v24c4-2 10-2 15 1 5-3 11-3 15-1V51c-4-2-10-2-15 1z" fill="none" stroke="currentColor" stroke-width="1"/><path pathLength="1" d="M60 52v24" stroke="currentColor" stroke-width=".8"/></svg>
+          <span class="limit">장 수 제한 없음</span>
+          <h3>책</h3>
+          <p>여러 생각이 하나의 흐름으로 이어지는 곳. 여러 장의 목차를 가지며, 책에는 ‘완료’가 없습니다.</p>
+        </div>
       </div>
+      <p class="flow-note">반드시 이 순서대로 쓸 필요는 없습니다. 중요한 것은 글의 길이가 아니라 생각이 머무는 시간입니다.</p>
     </div>
   </section>
 
+  <!-- ── 장면 2 · 10:00 생각이 자라다 ── -->
+  <section class="scene" id="how">
+    <div class="wrap scene-head" data-enter>
+      <p class="time-label">10:00 — 오전</p>
+      <h2 class="scene-title" data-reveal>생각이 자라다</h2>
+      <p class="scene-lead">생각이 머무는 시간만큼 글이 자랍니다.</p>
+    </div>
+    <div class="seq"><div class="seq-stick">
+    <figure class="frame f-postits-six">
+      <div class="plate">
+        <picture>
+          <source type="image/avif" srcset="img/scenes/24-postits-six-960.avif 960w, img/scenes/24-postits-six-1536.avif 1536w" sizes="(min-width: 1600px) 1536px, 100vw">
+          <img src="img/scenes/24-postits-six.jpg" width="1536" height="1024" alt="원목 책상 위에 흩어진 여섯 장의 포스트잇" loading="lazy" decoding="async">
+        </picture>
+        <div class="ov pt-lilac" aria-hidden="true">삶에 늦고 빠름은 없다. 그저 각 사람에게 맞는 때가 있을 뿐. 혹시 죽을 때까지 그때가 오지 않은 사람은, 기회가 왔을 때 준비되어 있지 않은 사람일 뿐이다.</div>
+        <div class="ov pt-mint" aria-hidden="true">높은 가치를 지닌 것일수록 천천히 성숙한다.</div>
+        <div class="ov pt-butter" aria-hidden="true">그저 해야 할 일을 하면 된다. 본질에 집중하지 못하니 두려움이 따르는 것이다.</div>
+        <div class="ov pt-rose" aria-hidden="true">인간의 의지는 놀랄 만큼 위대하고, 정말 소스라치게 놀랄 만큼 나약하다. 의지는 의지 자체의 나약함이 문제라기보다 사실은 습관의 문제에 가깝다.</div>
+        <div class="ov pt-linen" aria-hidden="true">잃어버림이란 자각은 본래 내 것이라 생각하던 것을 상실했을 때 인지하는 것인가. 본래 내 것이라고 말할 수 있는 것이 있을까. 잠시 잠깐 지내다 가는 인생이라면, ‘맡겨졌다’고 생각하는 편이 자족하는 삶을 살기에 더 유리한 마음가짐 아닐까.</div>
+        <div class="ov pt-mist" aria-hidden="true">믿음의 크기는 그 사람이 감당할 수 있는 리스크의 크기에 의해 정해진다. 감당할 수 없는 리스크 속으로 뛰어들었다면, 그 대상을 온전히 신뢰하는</div>
+      </div>
+      <figcaption class="caption">10:00 · 책상 위의 포스트잇</figcaption>
+    </figure>
+    <figure class="frame f-postit-one">
+      <div class="plate">
+        <picture>
+          <source type="image/avif" srcset="img/scenes/10-postit-one-960.avif 960w, img/scenes/10-postit-one-1536.avif 1536w" sizes="(min-width: 1600px) 1536px, 100vw">
+          <img src="img/scenes/10-postit-one.jpg" width="1536" height="1024" alt="책상 위에 남은 민트색 포스트잇 한 장" loading="lazy" decoding="async">
+        </picture>
+        <div class="ov">높은 가치를 지닌 것일수록 천천히 성숙한다.</div>
+      </div>
+      <p class="frame-note">지금 막 지나가는 생각. 제목도 필요 없습니다. 책상에 붙여 두고 다시 볼 만한 생각인지 지켜봅니다.</p>
+    </figure>
+    <figure class="frame f-postit-paper">
+      <div class="plate">
+        <picture>
+          <source type="image/avif" srcset="img/scenes/11-postit-paper-960.avif 960w, img/scenes/11-postit-paper-1536.avif 1536w" sizes="(min-width: 1600px) 1536px, 100vw">
+          <img src="img/scenes/11-postit-paper.jpg" width="1536" height="1024" alt="민트색 포스트잇이 붙은 크림색 종이 한 장" loading="lazy" decoding="async">
+        </picture>
+        <div class="ov pt" aria-hidden="true">높은 가치를 지닌 것일수록 천천히 성숙한다.</div>
+        <div class="ov body">
+          <p>높은 가치를 지닌 것일수록 천천히 성숙한다.</p>
+          <p>예술은 하루아침에 이루어지는 법이 없으며, 훌륭한 사람은 하나의 깨달음으로 만들어지지 않는다. 수많은 깨달음과 배움이 오랜 시간 동안 유기적으로 엮여 좋은 방향으로 발전했을 때, 비로소 이루어져 간다.</p>
+        </div>
+        <p class="toast">생각이 포스트잇보다 커졌어요.</p>
+      </div>
+      <div class="mobile-text" aria-hidden="true">
+        <p>높은 가치를 지닌 것일수록 천천히 성숙한다.</p>
+        <p>예술은 하루아침에 이루어지는 법이 없으며, 훌륭한 사람은 하나의 깨달음으로 만들어지지 않는다. 수많은 깨달음과 배움이 오랜 시간 동안 유기적으로 엮여 좋은 방향으로 발전했을 때, 비로소 이루어져 간다.</p>
+      </div>
+      <p class="frame-note">300자 제한은 글쓰기를 방해하기 위한 제한이 아닙니다. 생각이 포스트잇이라는 그릇보다 커졌다는 신호입니다.</p>
+    </figure>
+    <figure class="frame f-book-open has-p">
+      <div class="plate">
+        <picture>
+          <source media="(max-width: 700px) and (orientation: portrait)" type="image/avif" srcset="img/scenes/22-book-open-p-1024.avif">
+          <source media="(max-width: 700px) and (orientation: portrait)" srcset="img/scenes/22-book-open-p.jpg">
+          <source type="image/avif" srcset="img/scenes/03-book-open-960.avif 960w, img/scenes/03-book-open-1536.avif 1536w" sizes="(min-width: 1600px) 1536px, 100vw">
+          <img src="img/scenes/03-book-open.jpg" width="1536" height="1024" alt="원목 책상 위에 펼쳐진 남색 천 표지의 책" loading="lazy" decoding="async">
+        </picture>
+        <div class="ov left"><p class="small">늦게 피는 사람</p><p>천천히 성숙하는 것들</p></div>
+        <div class="ov right">
+          <p>높은 가치를 지닌 것일수록 천천히 성숙한다.</p>
+          <p>예술은 하루아침에 이루어지는 법이 없으며, 훌륭한 사람은 하나의 깨달음으로 만들어지지 않는다. 수많은 깨달음과 배움이 오랜 시간 동안 유기적으로 엮여 좋은 방향으로 발전했을 때, 비로소 이루어져 간다.</p>
+        </div>
+      </div>
+      <p class="frame-note">여러 생각이 하나의 흐름으로 이어지는 곳. 여러 장의 목차를 가지며, 책에는 ‘완료’가 없습니다.</p>
+    </figure>
+    <figure class="frame f-book-closed has-p">
+      <div class="plate">
+        <picture>
+          <source media="(max-width: 700px) and (orientation: portrait)" type="image/avif" srcset="img/scenes/23-book-closed-p-1024.avif">
+          <source media="(max-width: 700px) and (orientation: portrait)" srcset="img/scenes/23-book-closed-p.jpg">
+          <source type="image/avif" srcset="img/scenes/12-book-closed-960.avif 960w, img/scenes/12-book-closed-1536.avif 1536w" sizes="(min-width: 1600px) 1536px, 100vw">
+          <img src="img/scenes/12-book-closed.jpg" width="1536" height="1024" alt="덮인 남색 천 표지의 책" loading="lazy" decoding="async">
+        </picture>
+        <div class="ov" aria-hidden="true">늦게 피는 사람</div>
+      </div>
+      <p class="frame-note">반드시 이 순서대로 쓸 필요는 없습니다. 중요한 것은 글의 길이가 아니라 생각이 머무는 시간입니다.</p>
+    </figure>
+    </div></div>
+    <div class="wrap phones" data-enter>
+      <figure class="phone"><div class="bezel"><picture><source type="image/avif" srcset="img/app/desk.avif"><img src="img/app/desk.jpg" alt="Indwell 책상 화면: 포스트잇 여섯 장" loading="lazy" decoding="async"></picture></div><figcaption>책상</figcaption></figure>
+      <figure class="phone"><div class="bezel"><picture><source type="image/avif" srcset="img/app/writing.avif"><img src="img/app/writing.jpg" alt="Indwell 작성창 화면: 단상 '천천히 성숙하는 것들'" loading="lazy" decoding="async"></picture></div><figcaption>작성창</figcaption></figure>
+    </div>
+  </section>
+
+  <!-- ── 장면 3 · 15:00 기록이 쌓이다 ── -->
+  <section class="scene" id="s3">
+    <div class="wrap scene-head" data-enter>
+      <p class="time-label">15:00 — 오후</p>
+      <h2 class="scene-title" data-reveal>기록이 쌓이다</h2>
+      <p class="scene-lead">쌓인 글은 삶의 궤적이 되고, 내가 어떤 사람이었는지를 남깁니다.</p>
+    </div>
+    <div class="seq"><div class="seq-stick">
+    <figure class="frame f-shelving">
+      <div class="plate">
+        <picture>
+          <source type="image/avif" srcset="img/scenes/13-shelving-960.avif 960w, img/scenes/13-shelving-1536.avif 1536w" sizes="(min-width: 1600px) 1536px, 100vw">
+          <img src="img/scenes/13-shelving.jpg" width="1536" height="1024" alt="원목 책장 빈자리에 남색 책 한 권을 꽂는 손" loading="lazy" decoding="async">
+        </picture>
+      </div>
+      <figcaption class="caption">15:00 · 서재</figcaption>
+    </figure>
+    <figure class="frame f-library">
+      <div class="plate">
+        <picture>
+          <source type="image/avif" srcset="img/scenes/04-library-960.avif 960w, img/scenes/04-library-1536.avif 1536w" sizes="(min-width: 1600px) 1536px, 100vw">
+          <img src="img/scenes/04-library.jpg" width="1536" height="1024" alt="아치형 창이 있는 서재와 듬성듬성 꽂힌 천 표지 책들" loading="lazy" decoding="async">
+        </picture>
+      </div>
+      <p class="frame-note">책상에서는 먼저 생각을 잡고, 서재에서는 그 생각을 더 오래 붙듭니다.</p>
+    </figure>
+    <figure class="frame f-library-full">
+      <div class="plate">
+        <picture>
+          <source type="image/avif" srcset="img/scenes/14-library-full-960.avif 960w, img/scenes/14-library-full-1536.avif 1536w" sizes="(min-width: 1600px) 1536px, 100vw">
+          <img src="img/scenes/14-library-full.jpg" width="1536" height="1024" alt="시간이 흘러 책이 가득 찬 같은 서재" loading="lazy" decoding="async">
+        </picture>
+      </div>
+    </figure>
+    </div></div>
+    <div class="wrap phones" data-enter>
+      <figure class="phone"><div class="bezel"><picture><source type="image/avif" srcset="img/app/library.avif"><img src="img/app/library.jpg" alt="Indwell 내 서재 화면: 생각더미와 책장" loading="lazy" decoding="async"></picture></div><figcaption>내 서재</figcaption></figure>
+    </div>
+
+    <div class="wrap scene-head" data-enter style="margin-top:96px">
+      <p class="time-label">독후감</p>
+      <h3 class="scene-title" data-reveal>같은 책, 다른 나</h3>
+      <p class="scene-lead">같은 책을 다시 읽으면 그 아래에 2차, 3차 독후감으로 이어 씁니다. 나이가 들며 같은 책에 대한 생각도 달라지기 때문입니다.</p>
+    </div>
+    <div class="seq"><div class="seq-stick">
+    <figure class="frame f-review has-p">
+      <div class="plate">
+        <picture>
+          <source media="(max-width: 700px) and (orientation: portrait)" type="image/avif" srcset="img/scenes/30-review-spring-p-1024.avif">
+          <source media="(max-width: 700px) and (orientation: portrait)" srcset="img/scenes/30-review-spring-p.jpg">
+          <source type="image/avif" srcset="img/scenes/27-review-spring-960.avif 960w, img/scenes/27-review-spring-1536.avif 1536w" sizes="(min-width: 1600px) 1536px, 100vw">
+          <img src="img/scenes/27-review-spring.jpg" width="1536" height="1024" alt="봄빛이 드는 책상 위의 다 읽은 책과 펼친 독후감 노트" loading="lazy" decoding="async">
+        </picture>
+        <div class="ov left"><p>데미안을 읽고</p><p class="small">헤르만 헤세 · 1차</p></div>
+        <div class="ov right"><p>알을 깨고 나온다는 말이 처음엔 용기처럼 들렸다. 나도 언젠가 무언가를 깨고 나가야 한다고 믿었다.</p></div>
+      </div>
+      <figcaption class="caption">봄</figcaption>
+    </figure>
+    <figure class="frame f-review has-p">
+      <div class="plate">
+        <picture>
+          <source media="(max-width: 700px) and (orientation: portrait)" type="image/avif" srcset="img/scenes/31-review-winter-p-1024.avif">
+          <source media="(max-width: 700px) and (orientation: portrait)" srcset="img/scenes/31-review-winter-p.jpg">
+          <source type="image/avif" srcset="img/scenes/28-review-winter-960.avif 960w, img/scenes/28-review-winter-1536.avif 1536w" sizes="(min-width: 1600px) 1536px, 100vw">
+          <img src="img/scenes/28-review-winter.jpg" width="1536" height="1024" alt="몇 해 뒤 겨울빛이 드는 같은 책상의 같은 책과 노트" loading="lazy" decoding="async">
+        </picture>
+        <div class="ov left"><p>데미안을 읽고, 2차 독후감</p><p class="small">헤르만 헤세 · 2차</p></div>
+        <div class="ov right"><p>다시 읽으니 깨는 일보다 그 안에 머물렀던 시간이 먼저 보인다. 껍질 안의 시간도 나를 키웠다.</p></div>
+      </div>
+      <figcaption class="caption">몇 해 뒤, 겨울</figcaption>
+    </figure>
+    </div></div>
+    <div class="wrap phones" data-enter>
+      <figure class="phone"><div class="bezel"><picture><source type="image/avif" srcset="img/app/review-list.avif"><img src="img/app/review-list.jpg" alt="Indwell 독후감 목록 화면" loading="lazy" decoding="async"></picture></div><figcaption>독후감 목록</figcaption></figure>
+      <figure class="phone"><div class="bezel"><picture><source type="image/avif" srcset="img/app/review-book.avif"><img src="img/app/review-book.jpg" alt="Indwell 독후감 화면: 데미안 1차·2차 독후감" loading="lazy" decoding="async"></picture></div><figcaption>한 권의 1차·2차 독후감</figcaption></figure>
+    </div>
+    <div class="wrap covers" data-enter aria-label="독후감 표지 네 가지">
+      <picture><source type="image/avif" srcset="img/covers/review-1.avif"><img src="img/covers/review-1.jpg" alt="독후감 표지 1" loading="lazy" decoding="async"></picture>
+      <picture><source type="image/avif" srcset="img/covers/review-2.avif"><img src="img/covers/review-2.jpg" alt="독후감 표지 2" loading="lazy" decoding="async"></picture>
+      <picture><source type="image/avif" srcset="img/covers/review-3.avif"><img src="img/covers/review-3.jpg" alt="독후감 표지 3" loading="lazy" decoding="async"></picture>
+      <picture><source type="image/avif" srcset="img/covers/review-4.avif"><img src="img/covers/review-4.jpg" alt="독후감 표지 4" loading="lazy" decoding="async"></picture>
+    </div>
+  </section>
+
+  <!-- ── 장면 4 · 19:00 오래된 문장을 다시 만나다 ── -->
+  <section class="scene returned" id="s4">
+    <div class="wrap scene-head" data-enter>
+      <p class="time-label">19:00 — 저녁 · 돌아온 글</p>
+      <h2 class="scene-title" data-reveal>오래된 문장을 다시 만나다</h2>
+      <div class="time">19:00</div>
+      <p class="scene-lead">사람은 글을 쓰지만, 대부분의 글을 다시 읽지 않습니다. Indwell은 매일 저녁 7시, 오래전에 쓴 단상 하나와 책 하나를 서재 맨 앞에 다시 꺼내 놓습니다.</p>
+      <p class="scene-lead">예전에는 보이지 않던 것이 보이고, 무심코 적어 둔 한 문장이 지금의 나에게 질문을 던지기도 합니다.</p>
+    </div>
+    <div class="seq"><div class="seq-stick">
+    <figure class="frame f-letter-folded has-p">
+      <div class="plate">
+        <picture>
+          <source media="(max-width: 700px) and (orientation: portrait)" type="image/avif" srcset="img/scenes/21-letter-folded-p-1024.avif">
+          <source media="(max-width: 700px) and (orientation: portrait)" srcset="img/scenes/21-letter-folded-p.jpg">
+          <source type="image/avif" srcset="img/scenes/15-letter-folded-960.avif 960w, img/scenes/15-letter-folded-1536.avif 1536w" sizes="(min-width: 1600px) 1536px, 100vw">
+          <img src="img/scenes/15-letter-folded.jpg" width="1536" height="1024" alt="책상 위에 반으로 접힌 채 놓인 오래된 종이" loading="lazy" decoding="async">
+        </picture>
+      </div>
+    </figure>
+    <figure class="frame f-letter-afternoon has-p">
+      <div class="plate">
+        <picture>
+          <source media="(max-width: 700px) and (orientation: portrait)" type="image/avif" srcset="img/scenes/19-letter-afternoon-p-1024.avif">
+          <source media="(max-width: 700px) and (orientation: portrait)" srcset="img/scenes/19-letter-afternoon-p.jpg">
+          <source type="image/avif" srcset="img/scenes/05-letter-afternoon-960.avif 960w, img/scenes/05-letter-afternoon-1536.avif 1536w" sizes="(min-width: 1600px) 1536px, 100vw">
+          <img src="img/scenes/05-letter-afternoon.jpg" width="1536" height="1024" alt="펼쳐진 오래된 종이와 만년필, 오후의 빛" loading="lazy" decoding="async">
+        </picture>
+        <div class="ov ink-faded"><p>높은 가치를 지닌 것일수록 천천히 성숙한다.</p></div>
+      </div>
+    </figure>
+    <figure class="frame f-letter-evening has-p" data-fx="sweep">
+      <div class="plate">
+        <picture>
+          <source media="(max-width: 700px) and (orientation: portrait)" type="image/avif" srcset="img/scenes/20-letter-evening-p-1024.avif">
+          <source media="(max-width: 700px) and (orientation: portrait)" srcset="img/scenes/20-letter-evening-p.jpg">
+          <source type="image/avif" srcset="img/scenes/06-letter-evening-960.avif 960w, img/scenes/06-letter-evening-1536.avif 1536w" sizes="(min-width: 1600px) 1536px, 100vw">
+          <img src="img/scenes/06-letter-evening.jpg" width="1536" height="1024" alt="같은 종이 위로 저녁 7시의 금빛이 드는 모습" loading="lazy" decoding="async">
+        </picture>
+        <div class="ov ink-faded" aria-hidden="true"><p>높은 가치를 지닌 것일수록 천천히 성숙한다.</p></div>
+      </div>
+      <figcaption class="caption">19:00 · 돌아온 글</figcaption>
+      <p class="frame-note">붙들지 않은 것은 놓아주되, 시간이 지난 뒤 새로운 내가 오래전의 나를 다시 만날 기회를 남겨두는 것입니다.</p>
+    </figure>
+    </div></div>
+    <div class="wrap phones" data-enter>
+      <figure class="phone"><div class="bezel"><picture><source type="image/avif" srcset="img/app/returned-shelf.avif"><img src="img/app/returned-shelf.jpg" alt="Indwell 내 서재: 돌아온 글 표시가 붙은 단상과 책" loading="lazy" decoding="async"></picture></div><figcaption>서재 맨 앞의 돌아온 글</figcaption></figure>
+      <figure class="phone"><div class="bezel"><picture><source type="image/avif" srcset="img/app/returned-popup.avif"><img src="img/app/returned-popup.jpg" alt="Indwell 돌아온 글 창: 190일 전 단상과 41일 전 책" loading="lazy" decoding="async"></picture></div><figcaption>돌아온 글</figcaption></figure>
+    </div>
+  </section>
+
+  <!-- ── 조용한 구역: 둘러보기·개인정보·자주 묻는 질문 (예전 문구 그대로) ── -->
   <section class="shots">
     <div class="wrap">
       <p class="eyebrow">둘러보기</p>
@@ -277,15 +374,6 @@
         <img src="img/screen-8.jpg" alt="내 서재 화면" loading="lazy">
       </div>
       <p class="hint">옆으로 넘겨 보세요 →</p>
-    </div>
-  </section>
-
-  <section class="returned">
-    <div class="wrap">
-      <p class="eyebrow">돌아온 글</p>
-      <div class="time">19:00</div>
-      <p>사람은 글을 쓰지만, 대부분의 글을 다시 읽지 않습니다. Indwell은 매일 저녁 7시, 오래전에 쓴 단상 하나와 책 하나를 서재 맨 앞에 다시 꺼내 놓습니다.</p>
-      <p class="dim">예전에는 보이지 않던 것이 보이고, 무심코 적어 둔 한 문장이 지금의 나에게 질문을 던지기도 합니다.</p>
     </div>
   </section>
 
@@ -318,9 +406,93 @@
     </div>
   </section>
 
-  <section id="download" class="download">
+  <!-- ── 장면 5 · 21:00 하루를 남기다 (일기) ── -->
+  <section class="scene night" id="s5">
+    <div class="wrap scene-head" data-enter>
+      <p class="time-label">21:00 — 밤 · 일기</p>
+      <h2 class="scene-title" data-reveal>하루를 남기다</h2>
+      <p class="scene-lead">일기는 하루에 한 편. 사흘 동안은 고쳐 쓸 수 있고, 그 뒤로는 덧쓰기만 남습니다.</p>
+      <p class="scene-lead">해마다 같은 날이 오면, 그날의 일기가 ‘이전 년도의 오늘’로 돌아옵니다.</p>
+    </div>
+    <div class="seq"><div class="seq-stick">
+    <figure class="frame f-diary-closed">
+      <div class="plate">
+        <picture>
+          <source type="image/avif" srcset="img/scenes/25-diary-closed-960.avif 960w, img/scenes/25-diary-closed-1536.avif 1536w" sizes="(min-width: 1600px) 1536px, 100vw">
+          <img src="img/scenes/25-diary-closed.jpg" width="1536" height="1024" alt="스탠드 불빛 아래 덮인 꽃 자수 일기장과 만년필" loading="lazy" decoding="async">
+        </picture>
+      </div>
+      <figcaption class="caption">21:00 · 일기장</figcaption>
+    </figure>
+    <figure class="frame f-diary-open has-p">
+      <div class="plate">
+        <picture>
+          <source media="(max-width: 700px) and (orientation: portrait)" type="image/avif" srcset="img/scenes/29-diary-open-p-1024.avif">
+          <source media="(max-width: 700px) and (orientation: portrait)" srcset="img/scenes/29-diary-open-p.jpg">
+          <source type="image/avif" srcset="img/scenes/26-diary-open-960.avif 960w, img/scenes/26-diary-open-1536.avif 1536w" sizes="(min-width: 1600px) 1536px, 100vw">
+          <img src="img/scenes/26-diary-open.jpg" width="1536" height="1024" alt="스탠드 불빛 아래 펼친 일기장" loading="lazy" decoding="async">
+        </picture>
+        <div class="ov left"><p class="small">2026년 10월 21일 (수)</p><p>오래 앉아 있던 날</p></div>
+        <div class="ov right"><p>창가에 오래 앉아 있었다. 해야 할 일은 그대로인데 마음은 조금 정리되었다.</p><p>서두르지 않아도 되는 하루가 있다는 걸 오늘 처음 알게 된 것 같다.</p></div>
+      </div>
+      <figcaption class="caption">오늘의 일기</figcaption>
+    </figure>
+    <figure class="frame f-diary-open f-diary-past has-p">
+      <div class="plate">
+        <picture>
+          <source media="(max-width: 700px) and (orientation: portrait)" type="image/avif" srcset="img/scenes/29-diary-open-p-1024.avif">
+          <source media="(max-width: 700px) and (orientation: portrait)" srcset="img/scenes/29-diary-open-p.jpg">
+          <source type="image/avif" srcset="img/scenes/26-diary-open-960.avif 960w, img/scenes/26-diary-open-1536.avif 1536w" sizes="(min-width: 1600px) 1536px, 100vw">
+          <img src="img/scenes/26-diary-open.jpg" width="1536" height="1024" alt="같은 일기장에 돌아온 1년 전 오늘의 일기" loading="lazy" decoding="async">
+        </picture>
+        <div class="ov left"><p class="small">2025년 10월 21일 (화)</p><p>우산</p></div>
+        <div class="ov right"><p>비가 온다길래 우산을 챙겼는데 끝내 오지 않았다. 괜히 하루 종일 하늘을 몇 번이나 올려다봤다.</p></div>
+      </div>
+      <figcaption class="caption">돌아온 일기 · 1년 전 오늘</figcaption>
+    </figure>
+    </div></div>
+    <div class="wrap phones" data-enter>
+      <figure class="phone"><div class="bezel"><picture><source type="image/avif" srcset="img/app/journal-home.avif"><img src="img/app/journal-home.jpg" alt="Indwell 일기장 화면: 돌아온 일기 '1년 전 오늘'과 달력" loading="lazy" decoding="async"></picture></div><figcaption>일기장 · 1년 전 오늘</figcaption></figure>
+      <figure class="phone"><div class="bezel"><picture><source type="image/avif" srcset="img/app/journal-entry.avif"><img src="img/app/journal-entry.jpg" alt="Indwell 일기 쓰기 화면" loading="lazy" decoding="async"></picture></div><figcaption>오늘의 일기</figcaption></figure>
+    </div>
+    <div class="wrap covers" data-enter aria-label="일기장 표지 아홉 가지">
+      <picture><source type="image/avif" srcset="img/covers/diary-1.avif"><img src="img/covers/diary-1.jpg" alt="일기장 표지 1" loading="lazy" decoding="async"></picture>
+      <picture><source type="image/avif" srcset="img/covers/diary-2.avif"><img src="img/covers/diary-2.jpg" alt="일기장 표지 2" loading="lazy" decoding="async"></picture>
+      <picture><source type="image/avif" srcset="img/covers/diary-3.avif"><img src="img/covers/diary-3.jpg" alt="일기장 표지 3" loading="lazy" decoding="async"></picture>
+      <picture><source type="image/avif" srcset="img/covers/diary-4.avif"><img src="img/covers/diary-4.jpg" alt="일기장 표지 4" loading="lazy" decoding="async"></picture>
+      <picture><source type="image/avif" srcset="img/covers/diary-5.avif"><img src="img/covers/diary-5.jpg" alt="일기장 표지 5" loading="lazy" decoding="async"></picture>
+      <picture><source type="image/avif" srcset="img/covers/diary-6.avif"><img src="img/covers/diary-6.jpg" alt="일기장 표지 6" loading="lazy" decoding="async"></picture>
+      <picture><source type="image/avif" srcset="img/covers/diary-7.avif"><img src="img/covers/diary-7.jpg" alt="일기장 표지 7" loading="lazy" decoding="async"></picture>
+      <picture><source type="image/avif" srcset="img/covers/diary-8.avif"><img src="img/covers/diary-8.jpg" alt="일기장 표지 8" loading="lazy" decoding="async"></picture>
+      <picture><source type="image/avif" srcset="img/covers/diary-9.avif"><img src="img/covers/diary-9.jpg" alt="일기장 표지 9" loading="lazy" decoding="async"></picture>
+    </div>
+  </section>
+
+  <!-- ── 마무리 · 23:00 이제는 당신의 생각을 쓸 차례 ── -->
+  <section id="download" class="scene night finale">
+    <div class="seq"><div class="seq-stick">
+    <figure class="frame f-paper-night has-p">
+      <div class="plate">
+        <picture>
+          <source media="(max-width: 700px) and (orientation: portrait)" type="image/avif" srcset="img/scenes/18-paper-night-p-1024.avif">
+          <source media="(max-width: 700px) and (orientation: portrait)" srcset="img/scenes/18-paper-night-p.jpg">
+          <source type="image/avif" srcset="img/scenes/07-paper-night-960.avif 960w, img/scenes/07-paper-night-1536.avif 1536w" sizes="(min-width: 1600px) 1536px, 100vw">
+          <img src="img/scenes/07-paper-night.jpg" width="1536" height="1024" alt="밤, 스탠드 불빛 아래 아무것도 쓰이지 않은 종이와 만년필" loading="lazy" decoding="async">
+        </picture>
+      </div>
+      <figcaption class="caption">23:00 · 책상</figcaption>
+    </figure>
+    <figure class="frame f-arch-night">
+      <div class="plate">
+        <picture>
+          <source type="image/avif" srcset="img/scenes/17-arch-night-960.avif 960w, img/scenes/17-arch-night-1536.avif 1536w" sizes="(min-width: 1600px) 1536px, 100vw">
+          <img src="img/scenes/17-arch-night.jpg" width="1536" height="1024" alt="아치형 창 너머 별이 뜬 남색 밤하늘" loading="lazy" decoding="async">
+        </picture>
+      </div>
+    </figure>
+    </div></div>
     <div class="wrap">
-      <h2><span class="lead-in">소음이 가득한 시대,</span><span class="gap"></span>이제는 당신의 생각을<br>쓸 차례입니다</h2>
+      <h2 data-reveal><span class="lead-in">소음이 가득한 시대,</span><span class="gap"></span>이제는 당신의 생각을<br>쓸 차례입니다</h2>
       <div class="stores">
         <a class="store primary" href="https://apps.apple.com/app/id6810987473" target="_blank" rel="noopener">App Store에서 받기</a>
         <span class="store soon" aria-disabled="true">Google Play · 곧 출시</span>
@@ -453,17 +625,6 @@
 <!-- GUIDE:END -->
   </article>
 </dialog>
-<script>
-  // '사용법'을 누르면 설명서 창을 열고, ✕·바깥 누르기·Esc로 닫는다
-  (function () {
-    var dlg = document.getElementById('guide');
-    function open(e) { if (e) e.preventDefault(); if (!dlg.open) { dlg.showModal(); dlg.querySelector('.g-body').scrollTop = 0; } }
-    document.querySelectorAll('.open-guide').forEach(function (a) { a.addEventListener('click', open); });
-    dlg.querySelector('.g-close').addEventListener('click', function () { dlg.close(); });
-    dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
-    if (location.hash === '#guide') open();
-  })();
-</script>
 
 <footer>
   <div class="wrap">

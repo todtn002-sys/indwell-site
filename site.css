@@ -1,0 +1,404 @@
+/* Indwell 웹사이트 모양. 글은 index.html, 움직임은 site.js.
+   고치면 index.html의 site.css 주소 뒤 ?v= 날짜도 바꿀 것(방문자 브라우저가 옛 파일을 기억하지 않게). */
+
+/* ── 기본값 ─────────────────────────────────────────── */
+:root {
+  --oat: #EFE3D6;      /* 앱 책상 기본 배경 '오트밀 아이보리' 평균색 */
+  --gold: #9A6B2A;     /* 오트밀 위에서 읽히는 짙은 금빛 */
+  --ink: #3B2A20;
+  --ink-dim: #75604F;
+  --rule: #D6C6B2;
+  --card: #F6EEE4;
+  --night: #0E1530;    /* 앱 아이콘 밤하늘 남색 */
+  --night-ink: #EDE3CC;
+  --serif: "Noto Serif KR", "AppleMyungjo", "Nanum Myeongjo", serif;
+  --title: "Indwell Title", var(--serif);   /* 앱 기본 서체(마루부리)에서 이 페이지 글자만 잘라 낸 서체 */
+  --latin: "Cormorant Garamond", "Noto Serif KR", Georgia, serif;
+  --wrap: 1080px;
+}
+/* 서체 파일은 tools/build-fonts.py가 만든다. 문구를 고치면 그 도구를 다시 실행할 것 */
+@font-face { font-family: "Indwell Title"; src: url(fonts/indwell-title-regular.woff2) format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Indwell Title"; src: url(fonts/indwell-title-bold.woff2) format("woff2"); font-weight: 700; font-display: swap; }
+
+/* 종이 결 바탕: 이어 붙이지 않은 한 장짜리 그림을 화면에 고정(스크롤해도 반복 없음).
+   넓은 화면 = 5120×2880, 세로 화면(휴대폰) = 1600×2880 */
+.paper-bg { position: fixed; inset: 0; z-index: -1; background: var(--oat) url(img/oatmeal-wide.jpg) center / cover no-repeat; }
+@media (orientation: portrait) { .paper-bg { background-image: url(img/oatmeal-tall.jpg); } }
+/* 필름 입자 한 겹: 그림들과 바탕의 질감을 하나로 묶는다. 누르기·고르기를 막지 않게 pointer-events 없음 */
+.grain { position: fixed; inset: 0; z-index: 30; pointer-events: none; opacity: .07; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .2 0 0 0 0 .15 0 0 0 0 .1 0 0 0 1.4 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+
+/* 기본 여백 없애기·그림이 화면 폭을 넘지 않게 */
+*, *::before, *::after { box-sizing: border-box; }
+img { max-width: 100%; }
+body { margin: 0; background: var(--oat); color: var(--ink); font-family: var(--serif); font-size: 16px; line-height: 1.8; word-break: keep-all; }
+.wrap { max-width: var(--wrap); margin-inline: auto; padding-inline: 20px; }
+h1, h2, h3 { font-weight: 500; text-wrap: balance; margin: 0; }
+p { margin: 0; }
+a { color: inherit; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+/* ── 맨 위 메뉴 ─────────────────────────────────────── */
+/* 따라오는 띠 높이만큼 남겨 두어, 메뉴로 이동했을 때 제목이 띠에 가리지 않게 */
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+/* 따라오는 메뉴 띠: 맨 위 메뉴가 화면 밖으로 나가면 위에서 내려온다(site.js가 .show를 붙임).
+   내용은 맨 위 메뉴(.nav-right)를 그대로 복사해 쓰므로 메뉴는 맨 위 한 곳만 고치면 된다.
+   남색 = 앱 아이콘 밤하늘색 */
+.stickybar { position: fixed; top: 0; left: 0; right: 0; z-index: 20; background: var(--night); padding-top: env(safe-area-inset-top, 0px); transform: translateY(-100%); visibility: hidden; transition: transform .25s ease, visibility .25s; box-shadow: 0 6px 20px rgba(14,21,48,.25); }
+.stickybar.show { transform: none; visibility: visible; }
+.stickybar .wrap { display: flex; justify-content: flex-end; padding-block: 10px; }
+.stickybar .nav-right { display: flex; align-items: center; gap: 20px; }
+.stickybar .menu { display: flex; gap: 22px; border: 0; padding: 0; }
+.stickybar .menu a { color: var(--night-ink); }
+.stickybar .menu a:hover { color: #FFFFFF; }
+.stickybar .get { background: var(--oat); color: var(--ink); }
+@media (prefers-reduced-motion: reduce) { .stickybar { transition: none; } }
+/* 맨 위 줄. 화면 폭마다 로고 크기를 정해 두어 메뉴와 부딪히지 않게 함:
+   600 미만(휴대폰) = 1줄: 로고·앱 받기 / 2줄: 메뉴
+   600 이상 = 한 줄: 로고 왼쪽, 메뉴·앱 받기 오른쪽 */
+.topbar .wrap { display: grid; grid-template-columns: auto 1fr auto; grid-template-areas: "brand . get" "menu menu menu"; align-items: center; gap: 14px 24px; padding-block: 20px 0; }
+.brand { grid-area: brand; margin: 0; line-height: 0; }
+/* 로고 = 같은 줄의 남은 폭을 꽉 채우는 크기(가로:세로 3.485).
+   실측(10-10): 메뉴 3개 213(600~820)·233(820 이상), 앱 받기 77, 칸 사이 24×2.
+   계산식의 빼는 값 = 여백 40 + 칸 사이 48 + 메뉴·버튼 폭 + 안전 여유 36(스크롤바·글꼴 차이 대비).
+   메뉴 글자나 버튼을 바꾸면 이 숫자도 다시 재야 한다.
+   원본 1812×520 — 가장 클 때도 원본보다 작게 표시되어 큰 화면에서 선명 */
+.brand img { height: max(40px, calc((100vw - 201px) / 3.485)); width: auto; }
+.nav-right { display: contents; }
+.menu { grid-area: menu; display: flex; justify-content: flex-end; gap: 22px; font-size: 15px; border-top: 1px solid var(--rule); padding-top: 8px; }
+.get { grid-area: get; }
+.menu a { text-decoration: none; color: var(--ink-dim); padding-block: 4px; }
+.menu a:hover { color: var(--ink); }
+.get { white-space: nowrap; text-decoration: none; font-size: 14px; font-weight: 600; color: var(--card); background: var(--ink); padding: 8px 16px; border-radius: 999px; }
+
+/* ── 앱 받기 단추 ───────────────────────────────────── */
+.stores { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px; }
+.store { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: 999px; font-size: 15px; text-decoration: none; border: 1px solid var(--gold); }
+.store.primary { background: var(--ink); border-color: var(--ink); color: var(--card); font-weight: 600; }
+.store.soon { color: var(--ink-dim); border-color: var(--rule); cursor: default; }
+.store svg { width: 18px; height: 18px; fill: currentColor; }
+
+/* ── 장면 공통 ──────────────────────────────────────── */
+/* 장면 = 머리글(시각·제목·짧은 글) + 그림판(.plate) 여러 장.
+   그림판은 그림 비율(가로 3:2 / 휴대폰 세로판 2:3)을 그대로 지키는 액자라서 그림이 잘리지 않고,
+   그 위에 얹는 글(.ov)은 그림판 폭에 대한 비율(%·cqw)로 자리 잡는다 → 화면 크기가 바뀌어도 종이 위 같은 자리.
+   큰 화면에서는 그림판이 원본 폭(1536)을 넘지 않고 둘레에 오트밀 여백이 남는다(그림을 키우지 않음). */
+.scene { padding-block: 72px; }
+.scene-head { max-width: 40em; }
+.time-label { font-family: var(--latin); font-size: 14px; letter-spacing: .2em; color: var(--gold); }
+.scene-title { font-family: var(--title); font-weight: 400; font-size: clamp(28px, 6vw, 44px); line-height: 1.35; margin-top: 10px; }
+.scene-lead { margin-top: 18px; color: var(--ink-dim); max-width: 34em; }
+.frame { margin: 48px 0 0; }
+.plate { position: relative; margin-inline: auto; overflow: hidden; container-type: inline-size; background: var(--card);
+  width: min(100%, 1536px, calc((100svh - 48px) * 1.5)); aspect-ratio: 3 / 2; }
+.plate picture { position: absolute; inset: 0; display: block; }   /* 그림 틀도 그림판 크기로 — 그래야 빛 쓸기·다가가기 효과가 그림에 걸린다 */
+.plate img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.caption { margin: 10px auto 0; width: min(100%, 1536px, calc((100svh - 48px) * 1.5)); font-family: var(--latin); font-size: 13px; letter-spacing: .08em; color: var(--ink-dim); }
+.frame-note { margin: 14px auto 0; width: min(100%, 1536px, calc((100svh - 48px) * 1.5)); color: var(--ink-dim); max-width: 34em; }
+
+/* 그림 위에 얹는 글: --x·--y = 왼쪽 위 자리(그림판 폭·높이의 %), --w = 폭(%), --fs = 글자 크기(그림판 폭의 %),
+   --tf = 기울기·원근(종이 결에 맞춤). 값은 frame마다 아래 '그림별 자리'에서 정한다. */
+.ov { position: absolute; left: calc(var(--x) * 1%); top: calc(var(--y) * 1%); width: calc(var(--w) * 1%);
+  font-family: var(--title); font-size: calc(var(--fs) * 1cqw); line-height: 1.75; color: #2E2119; transform-origin: 50% 50%; transform: var(--tf, none); }
+.ov p + p { margin-top: .9em; }
+.ov .small { font-size: .62em; color: #6E5A4B; letter-spacing: .04em; }
+.ov.ink-faded { color: rgba(60, 42, 30, .62); }   /* 바랜 종이 위의 오래된 잉크 */
+/* 앱이 실제로 띄우는 안내 문구를 앱 모양 그대로 보여 주는 쪽지 */
+.toast { position: absolute; left: 50%; bottom: 7%; transform: translateX(-50%); padding: .7em 1.4em; border-radius: 999px;
+  background: rgba(46, 33, 25, .86); color: var(--night-ink); font-size: max(13px, 1.1cqw); white-space: nowrap; }
+
+/* 큰 문장 장면(영상의 큰 글자 장면을 인드웰 식으로): 흐린 그림 위에 한 문장 */
+.statement .plate::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(239,227,214,.88) 0%, rgba(239,227,214,.55) 55%, rgba(239,227,214,0) 85%); }
+.statement-text { position: absolute; z-index: 1; left: 7%; top: 50%; transform: translateY(-50%); width: 58%;
+  font-family: var(--title); font-size: 4.4cqw; line-height: 1.45; color: var(--ink); }
+
+/* ── 첫 화면(장면 1) ────────────────────────────────── */
+.hero { padding-top: 28px; }
+.hero .plate::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(90deg, rgba(239,227,214,.9) 0%, rgba(239,227,214,.6) 30%, rgba(239,227,214,0) 52%); }
+.hero-copy { position: absolute; z-index: 2; left: 5.5%; top: 50%; transform: translateY(-50%); width: 38%; }
+.hero .meaning { display: flex; align-items: baseline; gap: 12px; font-size: 15px; color: var(--ink-dim); letter-spacing: .04em; }
+.hero .meaning .word { font-family: var(--latin); font-size: 30px; font-weight: 600; color: var(--gold); letter-spacing: .02em; }
+.hero .line { width: 48px; height: 1px; background: var(--gold); opacity: .6; margin-block: 24px; }
+.hero .lead { font-family: var(--title); font-size: clamp(19px, 1.9cqw, 28px); line-height: 1.7; }
+.hero .stores { margin-top: 32px; }
+
+/* ── 세 가지 글 (가는 선 격자 + 도장 문양) ──────────────── */
+.intro .big { font-family: var(--title); font-size: clamp(22px, 5.4vw, 32px); line-height: 1.6; max-width: 22em; margin-top: 14px; }
+.intro .body { margin-top: 24px; max-width: 34em; color: var(--ink-dim); }
+.intro strong { color: var(--ink); font-weight: 500; }
+.pillars { display: grid; margin-top: 56px; border-top: 1px solid var(--rule); }
+.pillar { padding: 32px 0; border-bottom: 1px solid var(--rule); display: grid; gap: 10px; }
+.emblem { width: 96px; height: 96px; color: var(--ink-dim); }
+.pillar h3 { font-family: var(--title); font-size: 22px; font-weight: 400; margin-top: 8px; }
+.pillar .limit { font-size: 13px; letter-spacing: .04em; color: var(--gold); }
+.pillar p { color: var(--ink-dim); font-size: 15px; }
+.flow-note { margin-top: 24px; color: var(--ink-dim); font-size: 15px; max-width: 34em; }
+
+/* ── 실제 앱 화면(휴대폰 틀) ─────────────────────────── */
+/* 틀만 그리고 화면은 실제 앱을 찍은 그림 그대로(1206×2622) */
+.phones { display: flex; flex-wrap: wrap; justify-content: center; gap: 28px; margin-top: 48px; }
+.phone { margin: 0; width: clamp(200px, 21vw, 280px); }
+.phone .bezel { padding: 7px; border-radius: 40px; background: #1E1A17; box-shadow: 0 24px 50px rgba(59,42,32,.22); }
+.phone img { display: block; width: 100%; aspect-ratio: 1206 / 2622; border-radius: 33px; }
+.phone figcaption { margin-top: 12px; text-align: center; font-size: 13px; color: var(--ink-dim); }
+
+/* ── 앱 표지 진열(일기장·독후감) ─────────────────────── */
+.covers { display: flex; flex-wrap: wrap; justify-content: center; gap: 22px; margin-top: 40px; }
+.covers img { width: clamp(74px, 9vw, 120px); height: auto; filter: drop-shadow(0 10px 14px rgba(59,42,32,.18)); }
+
+/* ── 돌아온 글(장면 4)의 큰 시각 ─────────────────────── */
+.returned .time { font-family: var(--latin); font-size: clamp(72px, 18vw, 120px); color: var(--gold); line-height: 1; margin-top: 18px; font-variant-numeric: tabular-nums; }
+.returned .scene-lead + .scene-lead { margin-top: 12px; font-size: 15px; }
+
+/* ── 밤 장면(장면 5·마무리) ──────────────────────────── */
+.night { background: var(--night); color: var(--night-ink); }
+.night .time-label { color: #C9A86A; }
+.night .scene-lead, .night .caption, .night .phone figcaption, .night .frame-note { color: #B9AE9C; }
+.night .plate { background: #1A1F33; }
+.night .phone .bezel { background: #05070F; box-shadow: 0 24px 50px rgba(0,0,0,.45); }
+.finale { text-align: center; padding-bottom: 96px; }
+.finale h2 { font-family: var(--title); font-weight: 400; font-size: clamp(26px, 5.6vw, 40px); line-height: 1.5; margin-top: 40px; }
+.finale .lead-in { color: #B9AE9C; }
+.finale .gap { display: block; height: .5em; }
+.finale .stores { justify-content: center; }
+.night .store.primary { background: var(--night-ink); border-color: var(--night-ink); color: var(--night); }
+.night .store.soon { color: #B9AE9C; border-color: rgba(237,227,204,.3); }
+
+/* ── 조용한 구역: 개인정보·둘러보기·자주 묻는 질문 (예전 그대로) ── */
+section { padding-block: 72px; }
+.eyebrow { font-size: 13px; letter-spacing: .14em; color: var(--ink-dim); }
+h2 { font-size: clamp(24px, 5.6vw, 32px); line-height: 1.45; margin-top: 10px; }
+.gallery { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; padding-block: 8px 20px; margin-top: 36px; scrollbar-width: thin; }
+.gallery img { flex: 0 0 auto; width: min(62vw, 240px); aspect-ratio: 9 / 16; object-fit: cover; border-radius: 14px; scroll-snap-align: start; box-shadow: 0 8px 24px rgba(59,42,32,.12); background: var(--card); }
+.hint { font-size: 13px; color: var(--ink-dim); margin-top: 4px; }
+.privacy-list { list-style: none; padding: 0; margin: 36px 0 0; display: grid; gap: 0; border-top: 1px solid var(--rule); }
+.privacy-list li { padding-block: 20px; border-bottom: 1px solid var(--rule); display: grid; gap: 4px; }
+.privacy-list b { font-weight: 600; font-size: 17px; }
+.privacy-list span { color: var(--ink-dim); font-size: 15px; }
+.faq { border-top: 1px solid var(--rule); }
+.faq details { border-bottom: 1px solid var(--rule); padding-block: 18px; }
+.faq summary { cursor: pointer; font-size: 17px; font-weight: 500; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "＋"; color: var(--ink-dim); }
+.faq details[open] summary::after { content: "－"; }
+.faq details p { margin-top: 10px; color: var(--ink-dim); font-size: 15px; max-width: 34em; }
+
+/* ── 사용 설명서 창 — 앱 설명서 카드와 같은 위계(장 제목·소제목·본문·왼쪽 선 강조문) ── */
+.guide { width: min(720px, 100% - 24px); max-width: none; max-height: min(88vh, 100% - 24px); padding: 0; border: 1px solid var(--rule); border-radius: 18px; background: var(--card); color: var(--ink); box-shadow: 0 30px 80px rgba(59,42,32,.25); overflow: hidden; }
+.guide[open] { display: flex; flex-direction: column; }
+.guide::backdrop { background: rgba(59,42,32,.35); }
+.g-bar { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid var(--rule); font-size: 15px; color: var(--ink-dim); }
+.g-close { border: 0; background: none; font-size: 18px; color: var(--ink); cursor: pointer; padding: 4px 8px; }
+.g-body { overflow-y: auto; padding: 28px clamp(20px, 5vw, 48px) 48px; font-size: 16px; line-height: 1.85; }
+.g-head { text-align: center; padding-bottom: 12px; }
+.g-head img { height: 40px; width: auto; }
+.g-sub { margin-top: 10px; font-size: 16px; }
+.g-cap { font-size: 13px; color: var(--ink-dim); }
+.g-h { font-size: 20px; font-weight: 600; margin-top: 44px; margin-bottom: 4px; }
+.g-s { font-size: 16px; font-weight: 600; margin: 18px 0 0; }
+.g-p { margin-top: 12px; }
+.g-p strong, .g-em strong { font-weight: 600; }
+.g-em { margin-top: 16px; padding-left: 14px; border-left: 3px solid #8D6E63; font-weight: 600; }
+.g-rule { border: 0; border-top: 1px solid var(--rule); margin: 36px 0 8px; }
+.g-end { display: block; height: 32px; width: auto; margin: 28px auto 0; }
+
+/* ── 맨 아래 ───────────────────────────────────────── */
+footer { border-top: 1px solid var(--rule); padding-block: 40px 56px; font-size: 14px; color: var(--ink-dim); }
+footer .wrap { display: grid; gap: 20px; justify-items: center; text-align: center; }
+footer nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 24px; }
+footer .mail { user-select: all; color: var(--ink); }
+.copy { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; }
+/* 원본 1812×520 → 604×173 사본, 표시 높이 28 (고화질 화면 대비 여유) */
+.logo { height: 28px; width: auto; }
+
+/* ── 그림별 글 자리 (가로 3:2 그림 기준, 값은 그림판에 대한 %) ── */
+.f-paper-morning   .ov { --x: 44; --y: 56; --w: 28; --fs: 1.9;  --tf: perspective(80cqw) rotateX(38deg) rotateZ(-8deg); }
+.f-postits-six     .ov { --w: 13; --fs: .95; overflow: hidden; max-height: 14%; }
+.f-postits-six .pt-lilac  { --x: 18.5; --y: 31; --tf: rotate(-4deg); }
+.f-postits-six .pt-mint   { --x: 44.5; --y: 19; --tf: rotate(-2deg); }
+.f-postits-six .pt-butter { --x: 68.5; --y: 29.5; --tf: rotate(-6deg); }
+.f-postits-six .pt-rose   { --x: 26.5; --y: 57; --tf: rotate(-3deg); }
+.f-postits-six .pt-linen  { --x: 45.5; --y: 72; --tf: rotate(-2deg); }
+.f-postits-six .pt-mist   { --x: 62.5; --y: 55.5; --tf: rotate(3deg); }
+.f-postit-one      .ov { --x: 44.5; --y: 19; --w: 13; --fs: .95; --tf: rotate(-2deg); }
+.f-postit-paper    .ov.pt { --x: 44.5; --y: 19; --w: 13; --fs: .95; --tf: rotate(-2deg); }
+.f-postit-paper    .ov.body { --x: 35; --y: 39; --w: 29.5; --fs: 1.12; --tf: rotate(-.6deg); }
+.f-book-open       .ov.left  { --x: 24; --y: 30; --w: 23; --fs: 1.1; }
+.f-book-open       .ov.right { --x: 52.5; --y: 28; --w: 24; --fs: 1.02; }
+.f-book-closed     .ov { --x: 56; --y: 34; --w: 21; --fs: 1.5; color: #D9B977; text-align: center; }
+.f-letter-afternoon .ov,
+.f-letter-evening  .ov { --x: 44; --y: 57; --w: 29; --fs: 2.1; --tf: perspective(80cqw) rotateX(34deg) rotateZ(4deg); }
+/* 일기장 네 모서리의 꽃 장식을 피해 안쪽으로 */
+.f-diary-open      .ov.left  { --x: 21.5; --y: 28; --w: 22; --fs: 1.15; }
+.f-diary-open      .ov.right { --x: 51.5; --y: 27; --w: 22; --fs: 1.05; }
+.f-review          .ov.left  { --x: 40; --y: 25; --w: 20; --fs: 1.05; }
+.f-review          .ov.right { --x: 64; --y: 25; --w: 21; --fs: .98; }
+
+/* ── 화면 폭별 ──────────────────────────────────────── */
+/* 휴대폰 세로: 세로판이 있는 그림은 2:3 그림판으로 바꾸고 글 자리도 세로판 기준으로.
+   이 조건은 index.html의 <source media="…">와 같아야 한다(그림과 글 자리가 같은 판을 가리키도록). */
+@media (max-width: 700px) and (orientation: portrait) {
+  .has-p .plate, .has-p .caption, .has-p .frame-note { width: 100%; aspect-ratio: 2 / 3; }
+  .has-p .caption, .has-p .frame-note { aspect-ratio: auto; }
+  .f-paper-morning   .ov { --x: 22; --y: 55; --w: 60; --fs: 3.6; --tf: perspective(80cqw) rotateX(30deg) rotateZ(-2deg); }
+  .f-book-open       .ov.left  { --x: 10; --y: 30; --w: 35; --fs: 2.2; }
+  .f-book-open       .ov.right { --x: 52; --y: 28.5; --w: 39; --fs: 2.05; }
+  .f-book-closed     .ov { --x: 52; --y: 33; --w: 40; --fs: 3; }
+  .f-letter-afternoon .ov,
+  .f-letter-evening  .ov { --x: 18; --y: 55; --w: 64; --fs: 3.8; --tf: perspective(80cqw) rotateX(30deg) rotateZ(1deg); }
+  .f-diary-open      .ov.left  { --x: 12; --y: 33; --w: 30; --fs: 2.3; }
+  .f-diary-open      .ov.right { --x: 51; --y: 32; --w: 31; --fs: 2.1; }
+  .f-review          .ov.left  { --x: 10.5; --y: 44; --w: 37; --fs: 2.1; }
+  .f-review          .ov.right { --x: 53; --y: 44; --w: 37; --fs: 1.95; }
+  /* 첫 화면: 세로판 그림의 위쪽 빈 벽 자리에 글과 단추를 얹는다(그림 틀 밖으로 내보내면 잘림).
+     위에서 아래로 옅어지는 오트밀 막을 깔아 글이 읽히게 하고, 종이(그림 아래쪽 절반)는 가리지 않는다 */
+  .hero .plate::before { background: linear-gradient(180deg, rgba(239,227,214,.94) 0%, rgba(239,227,214,.8) 34%, rgba(239,227,214,0) 50%); }
+  .hero-copy { left: 0; right: 0; top: 0; transform: none; width: auto; padding: 22px 20px 0; }
+  .hero .meaning .word { font-size: 24px; }
+  .hero .line { margin-block: 14px; }
+  .hero .lead { font-size: 17px; }
+  .hero .stores { margin-top: 18px; gap: 8px; }
+  .hero .store { padding: 9px 14px; font-size: 13px; }
+  /* 그림 아래 글: 화면 가장자리에 붙지 않게 양옆 여백 */
+  .caption, .frame-note, .mobile-text { padding-inline: 20px; }
+  /* 단상 전문은 휴대폰 가로 그림 위에서 너무 작아지므로 그림 아래 글로 보여 준다 */
+  .f-postit-paper .ov.body { display: none; }
+  .f-postit-paper .mobile-text { display: block; }
+  .statement-text { width: 80%; font-size: 6.2cqw; }
+}
+.mobile-text { display: none; margin: 18px auto 0; width: min(100%, 34em); font-family: var(--title); line-height: 1.85; }
+.mobile-text p + p { margin-top: .9em; }
+/* 휴대폰 세로에서 가로 그림의 그림판은 폭에 맞춘다(세로 화면 높이 기준 계산이 폭보다 커지지 않게) */
+@media (orientation: portrait) {
+  .plate, .caption, .frame-note { width: min(100%, 1536px); }
+}
+
+@media (min-width: 600px) {
+  .topbar .wrap { grid-template-areas: "brand menu get"; }
+  .brand img { height: calc((100vw - 414px) / 3.485); }
+  .menu { justify-content: flex-end; gap: 22px; border-top: 0; padding-top: 0; }
+}
+/* 컴퓨터 화면: 옆으로 펼치기 */
+@media (min-width: 820px) {
+  .topbar .wrap { padding-block: 36px 0; }
+  .brand img { height: calc((min(100vw, 1080px) - 434px) / 3.485); }
+  .menu { gap: 32px; }
+  section, .scene { padding-block: 104px; }
+  .split { display: grid; grid-template-columns: 1fr 1.4fr; gap: 64px; align-items: start; }
+  .split .privacy-list { margin-top: 0; }
+  .gallery img { width: 230px; }
+  .pillars { grid-template-columns: repeat(3, 1fr); }
+  .pillar { padding: 36px 32px; border-bottom: 0; }
+  .pillar + .pillar { border-left: 1px solid var(--rule); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .store { transition: transform .2s ease; }
+  .store.primary:hover { transform: translateY(-2px); }
+  .covers img { transition: transform .3s ease; }
+  .covers img:hover { transform: translateY(-6px); }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   움직임 — site.js가 <html>에 .motion을 붙였을 때만 적용된다.
+   '움직임 줄이기'를 켠 기기나 스크립트가 없는 화면은 위의 멈춘 장면 그대로(모든 글·그림이 차례로 보임).
+   값의 흐름: site.js가 스크롤 위치로 계산해 아래 변수를 붙인다 → 여기서는 그 변수로 모양만 정한다.
+     .seq        --n(그림 수)            .frame --in(이 그림이 덮여 오는 정도 0~1)
+     .frame --a(이 그림의 글이 보이는 정도 0~1)   --p(묶음 전체 진행 0~1)   .nightfall --night-o
+   ══════════════════════════════════════════════════════════════════ */
+:root { --bar: 56px; --txt: 128px; --ease: cubic-bezier(.4, 0, .2, 1); --ease-out: cubic-bezier(.16, 1, .3, 1); }
+html.motion { scroll-behavior: auto; }   /* 부드러운 이동은 site.js가 직접 한다(브라우저 것과 겹치면 덜컥거림) */
+
+/* ── 장면 묶음: 화면에 붙잡아 두고 같은 자리에서 그림을 겹쳐 바꾼다 ── */
+/* 묶음 높이 = 화면 1장 + 그림 하나 바뀔 때마다 화면 0.85장 */
+.motion .seq { position: relative; height: calc(100svh + (var(--n, 1) - 1) * 85svh); }
+.motion .seq-stick { position: sticky; top: 0; height: 100svh; padding-top: calc(var(--bar) + 20px); padding-bottom: 64px; display: grid; align-items: start; justify-items: center; overflow: hidden; }
+/* ↑ 아래 64 = 시간 단추 자리. 그림들을 위쪽 기준으로 맞춘다 — 장마다 아래 글 길이가 달라도 겹치는 그림이 같은 자리에 놓이게 */
+.motion .seq .frame { grid-area: 1 / 1; margin: 0; width: 100%; pointer-events: none; }   /* --txt는 그림 아래 글에 남길 높이(그림판 크기 계산에만 씀) */
+.motion .seq .frame[data-active] { pointer-events: auto; }
+.motion .seq .plate, .motion .seq .caption, .motion .seq .frame-note, .motion .seq .mobile-text {
+  width: min(100%, 1536px, calc((100svh - var(--bar) - var(--txt) - 96px) * 1.5)); }
+/* 새 그림이 덮여 올 때: 그림판 전체(그림+그 위 글)가 아주 조금 다가오며 자리를 잡는다 */
+.motion .seq .plate { scale: calc(1 + (1 - var(--in, 1)) * .03); }
+.motion .seq .frame picture { opacity: var(--in, 1); }
+/* 겹쳐 놓은 그림판은 바탕을 비워 두고(아래 그림이 비치도록), 그림에 딸린 막도 그림과 함께 나타나게 */
+.motion .seq .plate { background: transparent; }
+.motion .seq .statement .plate::after { opacity: var(--in, 1); }
+/* 글은 자기 그림이 앞에 있을 때만 보이고, 살짝 떠오르며 나타난다 */
+.motion .seq .frame :is(.ov, .caption, .frame-note, .toast, .mobile-text, .statement-text, .hero-copy) {
+  opacity: var(--a, 1); translate: 0 calc((1 - var(--a, 1)) * 14px); }
+.motion .seq .frame .plate::before { opacity: var(--a, 1); }   /* 첫 화면 글 뒤의 옅은 막도 글과 함께 */
+/* 첫 화면 → 펜촉: 종이와 펜 쪽으로 천천히 다가간다 */
+.motion [data-fx="zoom"] picture { scale: calc(1 + var(--p, 0) * .18); transform-origin: 72% 76%; }   /* 그림만 그림판 안에서 커진다(틀 밖으로 넘치지 않게). 종이 위 글·소개 글은 그 전에 먼저 사라진다 */
+/* 저녁 7시: 그냥 겹치지 않고 창 쪽(오른쪽 위)에서부터 금빛이 종이를 쓸고 지나간다 */
+.motion [data-fx="sweep"] picture { opacity: 1;
+  -webkit-mask-image: linear-gradient(245deg, #000 calc(var(--in, 1) * 150% - 50%), transparent calc(var(--in, 1) * 150%));
+          mask-image: linear-gradient(245deg, #000 calc(var(--in, 1) * 150% - 50%), transparent calc(var(--in, 1) * 150%)); }
+
+/* ── 밤이 내려앉는다: 장면 5에 가까워질수록 화면 전체가 남색으로 ── */
+.nightfall { position: fixed; inset: 0; z-index: -1; background: var(--night); opacity: 0; pointer-events: none; }
+.motion .nightfall { opacity: var(--night-o, 0); }
+.motion .night { background: transparent; }
+.motion footer.is-night { color: #B9AE9C; border-top-color: rgba(237,227,204,.14); }
+.motion footer.is-night .mail { color: var(--night-ink); }
+.motion footer.is-night .logo { filter: brightness(0) invert(.9) sepia(.25); }
+
+/* ── 하루 시간 단추(레퍼런스의 유리 알약): 첫 화면을 지나면 아래에 떠오른다 ── */
+.timebar { position: fixed; left: 50%; bottom: max(18px, env(safe-area-inset-bottom)); z-index: 25; display: flex; gap: 2px; padding: 5px;
+  border-radius: 999px; background: rgba(246, 238, 228, .62); border: 1px solid rgba(59, 42, 32, .1);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2); backdrop-filter: blur(16px) saturate(1.2); box-shadow: 0 12px 34px rgba(59, 42, 32, .14);
+  font-family: var(--latin); font-size: 14px; letter-spacing: .06em; font-variant-numeric: tabular-nums;
+  translate: -50% 16px; opacity: 0; visibility: hidden; transition: opacity .6s var(--ease), translate .6s var(--ease), visibility .6s, background .6s, border-color .6s; }
+.timebar.show { translate: -50% 0; opacity: 1; visibility: visible; }
+.timebar a { padding: 6px 13px; border-radius: 999px; color: var(--ink-dim); text-decoration: none; transition: background .45s var(--ease), color .45s var(--ease); }
+.timebar a:hover { color: var(--ink); }
+.timebar a[aria-current] { background: var(--ink); color: var(--card); }
+.timebar.dark { background: rgba(14, 21, 48, .55); border-color: rgba(237, 227, 204, .14); }
+.timebar.dark a { color: #B9AE9C; }
+.timebar.dark a:hover { color: var(--night-ink); }
+.timebar.dark a[aria-current] { background: var(--night-ink); color: var(--night); }
+
+/* ── 글자가 흐림에서 선명으로(레퍼런스 제목 효과). site.js가 글자마다 .ch로 감싸고 --i(순번)를 붙인다 ── */
+.motion [data-reveal] .ch { opacity: 0; filter: blur(9px); transition: opacity .9s var(--ease-out), filter 1.2s var(--ease-out);
+  transition-delay: calc(min(var(--i), 48) * 26ms); }
+.motion [data-reveal].in .ch { opacity: 1; filter: blur(0); }
+/* 첫 화면 종이: 만년필로 쓰듯 한 글자씩 */
+.motion [data-ink] .ch { opacity: 0; filter: blur(2.5px); transition: opacity .55s ease-out, filter .8s ease-out;
+  transition-delay: calc(700ms + var(--i) * 80ms); }
+.motion [data-ink].in .ch { opacity: 1; filter: blur(0); }
+
+/* ── 화면에 들어올 때 떠오르기 ── */
+.motion [data-enter] { opacity: 0; translate: 0 28px; transition: opacity 1s var(--ease-out), translate 1.3s var(--ease-out); }
+.motion [data-enter].in { opacity: 1; translate: 0 0; }
+/* 휴대폰 화면·표지·세 가지 글은 하나씩 차례로 */
+.motion :is(.phones, .covers, .pillars)[data-enter] { opacity: 1; translate: none; }
+.motion :is(.phones, .covers, .pillars)[data-enter] > * { opacity: 0; translate: 0 36px; transition: opacity 1s var(--ease-out), translate 1.3s var(--ease-out), rotate 1.3s var(--ease-out); }
+.motion .phones[data-enter] > * { rotate: -1.2deg; }
+.motion :is(.phones, .covers, .pillars)[data-enter].in > * { opacity: 1; translate: 0 0; rotate: 0deg; }
+.motion :is(.phones, .covers, .pillars)[data-enter] > :nth-child(2) { transition-delay: .12s; }
+.motion :is(.phones, .covers, .pillars)[data-enter] > :nth-child(3) { transition-delay: .24s; }
+.motion :is(.phones, .covers, .pillars)[data-enter] > :nth-child(4) { transition-delay: .36s; }
+.motion :is(.phones, .covers, .pillars)[data-enter] > :nth-child(5) { transition-delay: .48s; }
+.motion :is(.phones, .covers, .pillars)[data-enter] > :nth-child(6) { transition-delay: .6s; }
+.motion :is(.phones, .covers, .pillars)[data-enter] > :nth-child(7) { transition-delay: .72s; }
+.motion :is(.phones, .covers, .pillars)[data-enter] > :nth-child(8) { transition-delay: .84s; }
+.motion :is(.phones, .covers, .pillars)[data-enter] > :nth-child(9) { transition-delay: .96s; }
+/* 도장 문양: 선이 그려지고(레퍼런스 조명 그림 효과) 둘레 글자가 뒤따라 나타난다 */
+.motion .emblem :is(circle, rect, path) { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 2s var(--ease); }
+.motion .emblem text { opacity: 0; transition: opacity 1.2s var(--ease) 1s; }
+.motion .pillars.in .emblem :is(circle, rect, path) { stroke-dashoffset: 0; }
+.motion .pillars.in .emblem text { opacity: 1; }
+
+@media (max-width: 700px) and (orientation: portrait) {
+  :root { --txt: 150px; }
+  .timebar { font-size: 12px; letter-spacing: .02em; }
+  .timebar a { padding: 5px 8px; }
+  /* 휴대폰 세로판(2:3) 그림판은 높이 기준으로 */
+  .motion .seq .has-p :is(.plate, .caption, .frame-note) { width: min(100%, calc((100svh - var(--bar) - var(--txt) - 96px) * 2 / 3)); }
+  /* 단상 전문을 그림 아래 글로 보여 주는 장만 글 자리를 넉넉히(가로 그림이라 그림 크기는 그대로) */
+  .motion .f-postit-paper { --txt: 330px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .timebar, .timebar a { transition: none; }
+}
+/* 화면에는 안 보이고 화면 읽기 프로그램만 읽는 글(글자를 나눠 움직일 때 원래 문장을 들려주기 위해) */
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
