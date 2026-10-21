@@ -414,10 +414,13 @@ html.motion { scroll-behavior: auto; }   /* 부드러운 이동은 site.js가 �
 /* 높이가 낮은 가로 화면(휴대폰 가로): 넓은 화면 규칙은 그림 아래 글 자리(--txt)를 먼저 떼어 그림이 엄지손톱만 해진다(10-22 아이폰 가로에서 확인).
    → 그림은 메뉴 띠와 시간 버튼 사이 높이를 다 쓰고, 설명 글은 그림 오른쪽 빈자리에 나란히(가로 화면은 옆이 넓다) */
 @media (orientation: landscape) and (max-height: 560px) {
-  :root { --plate-w: min(100vw - 340px, calc((100svh - 61px - 50px - 10px) * 1.5)); }
+  /* 높이 기준 = 100lvh(주소창이 접힌 큰 화면) — 세로 화면과 같은 방식. 100svh로 잡으면 가로에서는 주소창 자리(약 100pt)만큼
+     그림이 늘 작아진다(2026-10-22 아이폰 가로에서 그림 폭이 화면의 30%). 주소창이 펼쳐진 동안엔 그림 아래가 잠깐 가릴 수 있다 */
+  :root { --plate-w: min(100vw - 340px, calc((100lvh - 61px - 50px - 10px) * 1.5)); }
+  .motion .seq { height: calc(100lvh + (var(--n, 1) - 1) * 85svh); }
   .timebar { font-size: 11px; letter-spacing: .02em; bottom: 6px; }
   .timebar a { padding: 4px 9px; }
-  .motion .seq-stick { padding: calc(61px + 5px) 0 50px; align-items: center; }
+  .motion .seq-stick { height: 100lvh; padding: calc(61px + 5px) 0 50px; align-items: center; }
   .motion .seq .frame { display: grid; grid-template-columns: var(--plate-w) minmax(0, 250px); column-gap: 28px; justify-content: center; align-items: center; }
   .motion .seq .plate { width: var(--plate-w); margin: 0; grid-column: 1; grid-row: 1 / span 2; }
   .motion .seq :is(.caption, .frame-note) { grid-column: 2; grid-row: 1 / span 2; align-self: center; width: auto; max-width: none; margin: 0; padding: 0; }
