@@ -5,6 +5,7 @@
 //   GPT 그림   = ~/Downloads/인드웰 웹사이트 그림 재료/GPT가 만든 그림 (여기에 저장)/<번호>.png
 //   실제 앱 화면 = ~/Downloads/인드웰 웹사이트 그림 재료/실제 앱 화면/<이름>.png
 //   표지       = ~/dev/Indwell/src/assets/journal/  (앱 원본, 읽기만 함)
+//   일기 사진   = ~/Downloads/인드웰 웹사이트 그림 재료/일기 사진 (오래앉아 있던 날).png  (일기장에 붙인 사진)
 import AppKit
 import ImageIO
 import UniformTypeIdentifiers
@@ -13,6 +14,7 @@ let home = FileManager.default.homeDirectoryForCurrentUser.path
 let gptDir = "\(home)/Downloads/인드웰 웹사이트 그림 재료/GPT가 만든 그림 (여기에 저장)"
 let appShotDir = "\(home)/Downloads/인드웰 웹사이트 그림 재료/실제 앱 화면"
 let coverDir = "\(home)/dev/Indwell/src/assets/journal"
+let diaryPhoto = "\(home)/Downloads/인드웰 웹사이트 그림 재료/일기 사진 (오래앉아 있던 날).png"
 let site = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().path
 let oat = CGColor(srgbRed: 0xEF / 255.0, green: 0xE3 / 255.0, blue: 0xD6 / 255.0, alpha: 1)  // 바탕색 --oat
 
@@ -100,5 +102,11 @@ for i in 1...4 {
   let img = load("\(coverDir)/review_0\(i).jpg")
   save(resized(img, width: 480), "\(covers)/review-\(i).avif", avif, quality: 0.8)
   save(resized(img, width: 480, flatten: true), "\(covers)/review-\(i).jpg", .jpeg, quality: 0.82)
+}
+// 일기장에 붙인 사진: 폭 800
+do {
+  let img = load(diaryPhoto)
+  save(resized(img, width: 800), "\(scenes)/diary-photo.avif", avif, quality: 0.8)
+  save(resized(img, width: 800, flatten: true), "\(scenes)/diary-photo.jpg", .jpeg, quality: 0.82)
 }
 print("완료: 장면 \(landscape.count + portrait.count) · 앱 화면 \(appShots.count) · 표지 13")

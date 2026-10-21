@@ -41,6 +41,105 @@ var onScroll = (function () {
 function clamp01(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
 function ease(x) { x = clamp01(x); return x * x * (3 - 2 * x); }   // 처음·끝이 부드러운 0→1
 
+// ── 그림 속 종이에 손으로 쓴 글(.ov)·붙인 사진(.pasted) ──
+// 글 상자를 '종이 한 장'(가로 BOX, 세로는 그 종이의 실제 비율)으로 만들고, 그림에서 잰 종이의 네 모서리에 원근 변환으로 붙인다.
+//   data-quad="x,y x,y x,y x,y"   가로 그림(1536×1024)에서 종이의 왼위·오위·오아래·왼아래 (그림 폭·높이의 %)
+//   data-quad-p="…"               휴대폰 세로판(1024×1536)의 같은 종이. 세로판이 없는 그림은 생략
+//   data-pad="위 오른쪽 아래 왼쪽"  종이 안 여백(%). 위·아래는 종이 높이, 좌우는 종이 폭 기준 (세로판만 다르면 data-pad-p)
+//   data-fs="34"                  가장 큰 글자 크기(종이 폭 BOX 기준). 글이 여백 안에 다 들어갈 때까지 줄여 맞춘다
+//   data-pen                      필기구(잉크 색은 site.css)
+// .pasted(종이에 붙인 사진)도 같은 방식으로 종이에 붙는다 — 글자 맞추기만 하지 않는다. 기울기는 site.css에서 아주 조금만.
+// 글자마다 아주 작은 기울기·높낮이를 줘 손으로 쓴 결을 낸다(같은 글은 늘 같은 모양 — 순번으로 정한 흔들림).
+// 그림을 바꾸면 그 그림의 네 모서리를 다시 재서 data-quad를 고칠 것(눈대중 금지).
+var PORTRAIT = matchMedia('(max-width: 700px) and (orientation: portrait)');   // site.css·index.html의 휴대폰 세로 조건과 같게
+var inkReady = (function () {
+  var BOX = 400, els = [].slice.call(document.querySelectorAll('[data-quad]')), texts = els.filter(function (el) { return el.classList.contains('ov'); });
+  function solve(A, b) {   // 8×8 연립방정식(가우스 소거)
+    for (var i = 0; i < 8; i++) {
+      var m = i; for (var r = i + 1; r < 8; r++) if (Math.abs(A[r][i]) > Math.abs(A[m][i])) m = r;
+      var t = A[i]; A[i] = A[m]; A[m] = t; t = b[i]; b[i] = b[m]; b[m] = t;
+      for (r = i + 1; r < 8; r++) { var f = A[r][i] / A[i][i]; for (var c = i; c < 8; c++) A[r][c] -= f * A[i][c]; b[r] -= f * b[i]; }
+    }
+    var x = []; for (i = 7; i >= 0; i--) { var sum = b[i]; for (c = i + 1; c < 8; c++) sum -= A[i][c] * x[c]; x[i] = sum / A[i][i]; } return x;
+  }
+  function homography(w, h, q) {   // 사각형(0,0,w,h) → 네 점 q 로 보내는 원근 변환
+    var src = [[0, 0], [w, 0], [w, h], [0, h]], A = [], b = [];
+    for (var i = 0; i < 4; i++) {
+      var x = src[i][0], y = src[i][1], u = q[i][0], v = q[i][1];
+      A.push([x, y, 1, 0, 0, 0, -u * x, -u * y]); b.push(u);
+      A.push([0, 0, 0, x, y, 1, -v * x, -v * y]); b.push(v);
+    }
+    var k = solve(A, b);
+    return 'matrix3d(' + [k[0], k[3], 0, k[6], k[1], k[4], 0, k[7], 0, 0, 1, 0, k[2], k[5], 0, 1].join(',') + ')';
+  }
+  function handwrite(el, n) {   // 글자를 .c로 감싸고(줄바꿈은 낱말 단위) 흔들림을 준다. 화면 읽기에는 원래 문장을 통째로
+    var seed = n * 97 + 13, i = 0, full = el.textContent.replace(/\s+/g, ' ').trim();
+    function rnd() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280 - .5; }
+    (function walk(node) {
+      [].slice.call(node.childNodes).forEach(function (c) {
+        if (c.nodeType === 1) { walk(c); return; }
+        if (c.nodeType !== 3) return;
+        var frag = document.createDocumentFragment();
+        c.textContent.split(/(\s+)/).forEach(function (w) {
+          if (!w) return;
+          if (/^\s+$/.test(w)) { frag.appendChild(document.createTextNode(' ')); return; }
+          var word = document.createElement('span'); word.style.whiteSpace = 'nowrap';
+          w.split('').forEach(function (ch) {
+            var s = document.createElement('span'); s.className = 'c'; s.textContent = ch; s.style.setProperty('--i', i++);
+            s.style.transform = 'translateY(' + (rnd() * .07).toFixed(3) + 'em) rotate(' + (rnd() * 2.4).toFixed(2) + 'deg)';
+            word.appendChild(s);
+          });
+          frag.appendChild(word);
+        });
+        c.parentNode.replaceChild(frag, c);
+      });
+    })(el);
+    if (el.getAttribute('aria-hidden') !== 'true') {
+      var vis = document.createElement('span'); vis.setAttribute('aria-hidden', 'true');
+      while (el.firstChild) vis.appendChild(el.firstChild);
+      var sr = document.createElement('span'); sr.className = 'sr-only'; sr.textContent = full;
+      el.appendChild(sr); el.appendChild(vis);
+    }
+  }
+  function quad(el) {
+    var p = PORTRAIT.matches && el.dataset.quadP && el.closest('.has-p');
+    return { key: p ? 'p' : 'l', iw: p ? 1024 : 1536, ih: p ? 1536 : 1024,
+      pts: (p ? el.dataset.quadP : el.dataset.quad).trim().split(/\s+/).map(function (s) { return s.split(',').map(Number); }) };
+  }
+  function d(a, b) { return Math.hypot(a[0] - b[0], a[1] - b[1]); }
+  function layout(el) {
+    var plate = el.closest('.plate'), W = plate.clientWidth, H = plate.clientHeight;
+    if (!W || !H) return;
+    var q = quad(el);
+    if (el._key !== q.key) {   // 종이(가로판/세로판)가 바뀔 때만 상자 크기·글자 크기를 다시 맞춘다
+      el._key = q.key;
+      var P = q.pts.map(function (v) { return [v[0] / 100 * q.iw, v[1] / 100 * q.ih]; });
+      var bh = Math.round(BOX * (d(P[0], P[3]) + d(P[1], P[2])) / (d(P[0], P[1]) + d(P[3], P[2])));
+      var pad = ((q.key === 'p' && el.dataset.padP) || el.dataset.pad || '12 12 12 12').split(/\s+/).map(Number);
+      el.style.width = BOX + 'px'; el.style.height = bh + 'px';
+      el.style.padding = [pad[0] / 100 * bh, pad[1] / 100 * BOX, pad[2] / 100 * bh, pad[3] / 100 * BOX].map(function (v) { return v.toFixed(1) + 'px'; }).join(' ');
+      if (!el.classList.contains('ov')) { el._key = q.key; } else {
+      var fs = +(el.dataset.fs || 34); el.style.fontSize = fs + 'px';
+      while ((el.scrollHeight > el.clientHeight + 1 || el.scrollWidth > el.clientWidth + 1) && fs > 10) { fs -= 1; el.style.fontSize = fs + 'px'; }
+      }
+    }
+    el.style.transform = homography(BOX, parseFloat(el.style.height), q.pts.map(function (v) { return [v[0] / 100 * W, v[1] / 100 * H]; }));
+  }
+  function layoutAll() { els.forEach(layout); }
+  var fontsIn = document.fonts ? Promise.all([document.fonts.load('400 30px "Nanum Pen Script"', '가나다'), document.fonts.load('600 30px "Noto Serif KR"', '가나다')]) : Promise.resolve();
+  var wait = new Promise(function (r) { setTimeout(r, 3000); });   // 서체를 못 받아도 3초 뒤에는 대체 서체로 그린다
+  return Promise.race([fontsIn, wait]).catch(function () {}).then(function () {
+    texts.forEach(handwrite);
+    layoutAll();
+    document.documentElement.classList.add('ov-ready');
+    var queued = false;
+    function relayout() { if (!queued) { queued = true; requestAnimationFrame(function () { queued = false; layoutAll(); }); } }
+    addEventListener('resize', relayout);
+    if (PORTRAIT.addEventListener) PORTRAIT.addEventListener('change', relayout);
+    if (document.fonts) document.fonts.addEventListener('loadingdone', function () { els.forEach(function (el) { el._key = null; }); relayout(); });
+  });
+})();
+
 // ── 하루 시간 단추 ──
 // 첫 화면을 지나면 아래에 떠오르고, 화면 가운데를 지난 마지막 장면의 시각에 불이 들어온다. 맨 아래(footer)에서는 숨는다.
 // (움직임 줄이기 설정에서도 길잡이로 쓰인다)
@@ -61,7 +160,7 @@ function ease(x) { x = clamp01(x); return x * x * (3 - 2 * x); }   // 처음·�
 // ════ 아래는 움직임. <head>의 짧은 스크립트가 '움직임 줄이기'가 아닐 때만 <html>에 .motion을 붙인다 ════
 var MOTION = document.documentElement.classList.contains('motion');
 
-// ── 글자 나누기: [data-reveal](흐림→선명), [data-ink](한 글자씩 써짐) ──
+// ── 글자 나누기: [data-reveal](제목이 흐림→선명) ──
 // 화면 읽기 프로그램에는 원래 문장을 통째로 들려주고(.sr-only), 나눈 글자들은 숨긴다(aria-hidden).
 // 줄바꿈·안쪽 꾸밈(<br>·<span>)은 그대로 두고 글자만 감싼다.
 function splitChars(el) {
@@ -84,17 +183,15 @@ function splitChars(el) {
   el.appendChild(sr); el.appendChild(visible);
 }
 if (MOTION) {
-  document.querySelectorAll('[data-reveal], [data-ink]').forEach(splitChars);
+  document.querySelectorAll('[data-reveal]').forEach(splitChars);
   // 화면에 들어오면 한 번만 .in (다시 나가도 되돌리지 않음)
   var seen = new IntersectionObserver(function (es) {
     es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); seen.unobserve(e.target); } });
   }, { threshold: .18 });
   document.querySelectorAll('[data-reveal], [data-enter]').forEach(function (el) { seen.observe(el); });
-  // 첫 화면 종이 위 문장은 서체가 준비되면 바로 써 내려간다
-  (document.fonts ? document.fonts.ready : Promise.resolve()).then(function () {
-    requestAnimationFrame(function () { document.querySelectorAll('[data-ink]').forEach(function (el) { el.classList.add('in'); }); });
-  });
   document.querySelector('footer').classList.add('is-night');
+  // 첫 화면 종이 위 문장은 손글씨가 종이에 붙은 뒤 한 글자씩 써 내려간다
+  inkReady.then(function () { requestAnimationFrame(function () { document.querySelectorAll('[data-ink]').forEach(function (el) { el.classList.add('in'); }); }); });
 }
 
 // ── 장면 묶음(.seq): 화면에 붙잡힌 채 같은 자리에서 그림을 차례로 겹쳐 바꾼다 ──

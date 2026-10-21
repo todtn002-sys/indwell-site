@@ -14,6 +14,7 @@
   --serif: "Noto Serif KR", "AppleMyungjo", "Nanum Myeongjo", serif;
   --title: "Indwell Title", var(--serif);   /* 앱 기본 서체(마루부리)에서 이 페이지 글자만 잘라 낸 서체 */
   --latin: "Cormorant Garamond", "Noto Serif KR", Georgia, serif;
+  --hand: "Nanum Pen Script", "Noto Serif KR", cursive;   /* 그림 속 종이·포스트잇에 손으로 쓴 글. 그림 위에는 제목 서체(마루부리)를 쓰지 않는다 */
   --wrap: 1080px;
 }
 /* 서체 파일은 tools/build-fonts.py가 만든다. 문구를 고치면 그 도구를 다시 실행할 것 */
@@ -81,7 +82,7 @@ html { scroll-behavior: smooth; scroll-padding-top: 72px; }
 /* ── 장면 공통 ──────────────────────────────────────── */
 /* 장면 = 머리글(시각·제목·짧은 글) + 그림판(.plate) 여러 장.
    그림판은 그림 비율(가로 3:2 / 휴대폰 세로판 2:3)을 그대로 지키는 액자라서 그림이 잘리지 않고,
-   그 위에 얹는 글(.ov)은 그림판 폭에 대한 비율(%·cqw)로 자리 잡는다 → 화면 크기가 바뀌어도 종이 위 같은 자리.
+   그 위에 손으로 쓴 글(.ov)은 site.js가 그림 속 종이의 네 모서리(data-quad)에 맞춰 붙인다 → 종이가 기울고 누운 만큼 글도 함께.
    큰 화면에서는 그림판이 원본 폭(1536)을 넘지 않고 둘레에 오트밀 여백이 남는다(그림을 키우지 않음). */
 .scene { padding-block: 72px; }
 .scene-head { max-width: 40em; }
@@ -98,11 +99,28 @@ html { scroll-behavior: smooth; scroll-padding-top: 72px; }
 
 /* 그림 위에 얹는 글: --x·--y = 왼쪽 위 자리(그림판 폭·높이의 %), --w = 폭(%), --fs = 글자 크기(그림판 폭의 %),
    --tf = 기울기·원근(종이 결에 맞춤). 값은 frame마다 아래 '그림별 자리'에서 정한다. */
-.ov { position: absolute; left: calc(var(--x) * 1%); top: calc(var(--y) * 1%); width: calc(var(--w) * 1%);
-  font-family: var(--title); font-size: calc(var(--fs) * 1cqw); line-height: 1.75; color: #2E2119; transform-origin: 50% 50%; transform: var(--tf, none); }
-.ov p + p { margin-top: .9em; }
-.ov .small { font-size: .62em; color: #6E5A4B; letter-spacing: .04em; }
-.ov.ink-faded { color: rgba(60, 42, 30, .62); }   /* 바랜 종이 위의 오래된 잉크 */
+/* 그림 속 종이에 손으로 쓴 글. 자리·기울기·원근·글자 크기는 site.js가 정한다(여기서는 필기구별 잉크만).
+   잉크는 종이 색과 곱해져(multiply) 종이 결·나뭇잎 그림자가 글자 위로 비친다 — 종이에 스민 것처럼 */
+.ov { position: absolute; left: 0; top: 0; box-sizing: border-box; transform-origin: 0 0; visibility: hidden; pointer-events: none;
+  font-family: var(--hand); line-height: 1.4; word-break: keep-all; overflow-wrap: anywhere; mix-blend-mode: multiply; }
+html.ov-ready .ov { visibility: visible; }
+.ov .c { display: inline-block; }
+/* 종이에 붙인 사진: 자리는 site.js가 종이 네 모서리에 맞추고, 여기서는 손으로 붙인 듯한 작은 기울기와 얇은 그림자만 */
+.pasted { position: absolute; left: 0; top: 0; box-sizing: border-box; transform-origin: 0 0; visibility: hidden; pointer-events: none; }
+html.ov-ready .pasted { visibility: visible; }
+.pasted picture { position: static; display: block; }   /* 그림판 배경 그림 규칙(.plate picture/img)을 사진에는 쓰지 않게 */
+.pasted img { position: static; inset: auto; display: block; width: 100%; height: auto; rotate: -2.2deg; box-shadow: 0 1px 2px rgba(40, 24, 10, .28), 0 6px 14px rgba(40, 24, 10, .18); }
+.ov p + p { margin-top: .55em; }
+.ov .small { font-size: .74em; opacity: .8; }
+/* 글은 '무언가 써 있다'는 느낌이 목적 — 보려고 하면 읽히는 정도로 옅고 작게(부각 금지).
+   진하기는 색의 알파로만 정한다(opacity는 장면 움직임이 글을 나타내고 지우는 데 쓰므로 여기서 쓰면 덮어써짐) */
+.ov[data-pen="fountain"]  { color: rgba(30, 40, 82, .58);  filter: blur(.2px); }  /* 남색 만년필 잉크 */
+.ov[data-pen="ballpoint"] { color: rgba(30, 34, 52, .55);  filter: blur(.15px); }                                           /* 검정 볼펜 */
+.ov[data-pen="pencil"]    { color: rgba(80, 80, 84, .5);   filter: blur(.25px); }                                          /* 연필(흑연) */
+.ov[data-pen="faded"]     { color: rgba(100, 68, 44, .46); filter: blur(.25px); }                                          /* 오래되어 바랜 잉크 */
+/* 천 표지에 찍힌 금박 제목: 손글씨가 아니라 찍어 누른 글자라 본명조, 곱하기 대신 빛나는 금색 + 눌린 그림자 */
+.ov[data-pen="foil"] { font-family: var(--serif); font-weight: 600; letter-spacing: .08em; text-align: center; white-space: nowrap;
+  color: rgba(217, 182, 118, .9); mix-blend-mode: normal; filter: none; text-shadow: 0 1px 0 rgba(0, 0, 0, .45), 0 -.5px 0 rgba(255, 236, 190, .35); }
 /* 앱이 실제로 띄우는 안내 문구를 앱 모양 그대로 보여 주는 쪽지 */
 .toast { position: absolute; left: 50%; bottom: 7%; transform: translateX(-50%); padding: .7em 1.4em; border-radius: 999px;
   background: rgba(46, 33, 25, .86); color: var(--night-ink); font-size: max(13px, 1.1cqw); white-space: nowrap; }
@@ -110,7 +128,7 @@ html { scroll-behavior: smooth; scroll-padding-top: 72px; }
 /* 큰 문장 장면(영상의 큰 글자 장면을 인드웰 식으로): 흐린 그림 위에 한 문장 */
 .statement .plate::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(239,227,214,.88) 0%, rgba(239,227,214,.55) 55%, rgba(239,227,214,0) 85%); }
 .statement-text { position: absolute; z-index: 1; left: 7%; top: 50%; transform: translateY(-50%); width: 58%;
-  font-family: var(--title); font-size: 4.4cqw; line-height: 1.45; color: var(--ink); }
+  font-family: var(--serif); font-weight: 500; font-size: 4.2cqw; line-height: 1.5; color: var(--ink); }
 
 /* ── 첫 화면(장면 1) ────────────────────────────────── */
 .hero { padding-top: 28px; }
@@ -119,7 +137,7 @@ html { scroll-behavior: smooth; scroll-padding-top: 72px; }
 .hero .meaning { display: flex; align-items: baseline; gap: 12px; font-size: 15px; color: var(--ink-dim); letter-spacing: .04em; }
 .hero .meaning .word { font-family: var(--latin); font-size: 30px; font-weight: 600; color: var(--gold); letter-spacing: .02em; }
 .hero .line { width: 48px; height: 1px; background: var(--gold); opacity: .6; margin-block: 24px; }
-.hero .lead { font-family: var(--title); font-size: clamp(19px, 1.9cqw, 28px); line-height: 1.7; }
+.hero .lead { font-family: var(--serif); font-size: clamp(18px, 1.8cqw, 26px); line-height: 1.75; }
 .hero .stores { margin-top: 32px; }
 
 /* ── 세 가지 글 (가는 선 격자 + 도장 문양) ──────────────── */
@@ -143,8 +161,8 @@ html { scroll-behavior: smooth; scroll-padding-top: 72px; }
 .phone figcaption { margin-top: 12px; text-align: center; font-size: 13px; color: var(--ink-dim); }
 
 /* ── 앱 표지 진열(일기장·독후감) ─────────────────────── */
-.covers { display: flex; flex-wrap: wrap; justify-content: center; gap: 22px; margin-top: 40px; }
-.covers img { width: clamp(74px, 9vw, 120px); height: auto; filter: drop-shadow(0 10px 14px rgba(59,42,32,.18)); }
+.covers { display: grid; grid-template-columns: repeat(4, auto); justify-content: center; gap: 22px clamp(14px, 3vw, 34px); margin-top: 40px; }   /* 4개씩 한 줄 */
+.covers img { width: clamp(64px, 9vw, 120px); height: auto; filter: drop-shadow(0 10px 14px rgba(59,42,32,.18)); }
 
 /* ── 돌아온 글(장면 4)의 큰 시각 ─────────────────────── */
 .returned .time { font-family: var(--latin); font-size: clamp(72px, 18vw, 120px); color: var(--gold); line-height: 1; margin-top: 18px; font-variant-numeric: tabular-nums; }
@@ -211,45 +229,12 @@ footer .mail { user-select: all; color: var(--ink); }
 /* 원본 1812×520 → 604×173 사본, 표시 높이 28 (고화질 화면 대비 여유) */
 .logo { height: 28px; width: auto; }
 
-/* ── 그림별 글 자리 (가로 3:2 그림 기준, 값은 그림판에 대한 %) ── */
-.f-paper-morning   .ov { --x: 44; --y: 56; --w: 28; --fs: 1.9;  --tf: perspective(80cqw) rotateX(38deg) rotateZ(-8deg); }
-.f-postits-six     .ov { --w: 13; --fs: .95; overflow: hidden; max-height: 14%; }
-.f-postits-six .pt-lilac  { --x: 18.5; --y: 31; --tf: rotate(-4deg); }
-.f-postits-six .pt-mint   { --x: 44.5; --y: 19; --tf: rotate(-2deg); }
-.f-postits-six .pt-butter { --x: 68.5; --y: 29.5; --tf: rotate(-6deg); }
-.f-postits-six .pt-rose   { --x: 26.5; --y: 57; --tf: rotate(-3deg); }
-.f-postits-six .pt-linen  { --x: 45.5; --y: 72; --tf: rotate(-2deg); }
-.f-postits-six .pt-mist   { --x: 62.5; --y: 55.5; --tf: rotate(3deg); }
-.f-postit-one      .ov { --x: 44.5; --y: 19; --w: 13; --fs: .95; --tf: rotate(-2deg); }
-.f-postit-paper    .ov.pt { --x: 44.5; --y: 19; --w: 13; --fs: .95; --tf: rotate(-2deg); }
-.f-postit-paper    .ov.body { --x: 35; --y: 39; --w: 29.5; --fs: 1.12; --tf: rotate(-.6deg); }
-.f-book-open       .ov.left  { --x: 24; --y: 30; --w: 23; --fs: 1.1; }
-.f-book-open       .ov.right { --x: 52.5; --y: 28; --w: 24; --fs: 1.02; }
-.f-book-closed     .ov { --x: 56; --y: 34; --w: 21; --fs: 1.5; color: #D9B977; text-align: center; }
-.f-letter-afternoon .ov,
-.f-letter-evening  .ov { --x: 44; --y: 57; --w: 29; --fs: 2.1; --tf: perspective(80cqw) rotateX(34deg) rotateZ(4deg); }
-/* 일기장 네 모서리의 꽃 장식을 피해 안쪽으로 */
-.f-diary-open      .ov.left  { --x: 21.5; --y: 28; --w: 22; --fs: 1.15; }
-.f-diary-open      .ov.right { --x: 51.5; --y: 27; --w: 22; --fs: 1.05; }
-.f-review          .ov.left  { --x: 40; --y: 25; --w: 20; --fs: 1.05; }
-.f-review          .ov.right { --x: 64; --y: 25; --w: 21; --fs: .98; }
-
 /* ── 화면 폭별 ──────────────────────────────────────── */
-/* 휴대폰 세로: 세로판이 있는 그림은 2:3 그림판으로 바꾸고 글 자리도 세로판 기준으로.
-   이 조건은 index.html의 <source media="…">와 같아야 한다(그림과 글 자리가 같은 판을 가리키도록). */
+/* 휴대폰 세로: 세로판이 있는 그림은 2:3 그림판으로 바꾼다(글은 site.js가 세로판의 네 모서리 data-quad-p로).
+   이 조건은 index.html의 <source media="…">, site.js의 PORTRAIT와 같아야 한다(그림과 글이 같은 판을 가리키도록). */
 @media (max-width: 700px) and (orientation: portrait) {
   .has-p .plate, .has-p .caption, .has-p .frame-note { width: 100%; aspect-ratio: 2 / 3; }
   .has-p .caption, .has-p .frame-note { aspect-ratio: auto; }
-  .f-paper-morning   .ov { --x: 22; --y: 55; --w: 60; --fs: 3.6; --tf: perspective(80cqw) rotateX(30deg) rotateZ(-2deg); }
-  .f-book-open       .ov.left  { --x: 10; --y: 30; --w: 35; --fs: 2.2; }
-  .f-book-open       .ov.right { --x: 52; --y: 28.5; --w: 39; --fs: 2.05; }
-  .f-book-closed     .ov { --x: 52; --y: 33; --w: 40; --fs: 3; }
-  .f-letter-afternoon .ov,
-  .f-letter-evening  .ov { --x: 18; --y: 55; --w: 64; --fs: 3.8; --tf: perspective(80cqw) rotateX(30deg) rotateZ(1deg); }
-  .f-diary-open      .ov.left  { --x: 12; --y: 33; --w: 30; --fs: 2.3; }
-  .f-diary-open      .ov.right { --x: 51; --y: 32; --w: 31; --fs: 2.1; }
-  .f-review          .ov.left  { --x: 10.5; --y: 44; --w: 37; --fs: 2.1; }
-  .f-review          .ov.right { --x: 53; --y: 44; --w: 37; --fs: 1.95; }
   /* 첫 화면: 세로판 그림의 위쪽 빈 벽 자리에 글과 단추를 얹는다(그림 틀 밖으로 내보내면 잘림).
      위에서 아래로 옅어지는 오트밀 막을 깔아 글이 읽히게 하고, 종이(그림 아래쪽 절반)는 가리지 않는다 */
   .hero .plate::before { background: linear-gradient(180deg, rgba(239,227,214,.94) 0%, rgba(239,227,214,.8) 34%, rgba(239,227,214,0) 50%); }
@@ -264,7 +249,7 @@ footer .mail { user-select: all; color: var(--ink); }
   /* 단상 전문은 휴대폰 가로 그림 위에서 너무 작아지므로 그림 아래 글로 보여 준다 */
   .f-postit-paper .ov.body { display: none; }
   .f-postit-paper .mobile-text { display: block; }
-  .statement-text { width: 80%; font-size: 6.2cqw; }
+  .statement-text { width: 80%; font-size: 6cqw; }
 }
 .mobile-text { display: none; margin: 18px auto 0; width: min(100%, 34em); font-family: var(--title); line-height: 1.85; }
 .mobile-text p + p { margin-top: .9em; }
@@ -324,7 +309,7 @@ html.motion { scroll-behavior: auto; }   /* 부드러운 이동은 site.js가 �
 .motion .seq .plate { background: transparent; }
 .motion .seq .statement .plate::after { opacity: var(--in, 1); }
 /* 글은 자기 그림이 앞에 있을 때만 보이고, 살짝 떠오르며 나타난다 */
-.motion .seq .frame :is(.ov, .caption, .frame-note, .toast, .mobile-text, .statement-text, .hero-copy) {
+.motion .seq .frame :is(.ov, .pasted, .caption, .frame-note, .toast, .mobile-text, .statement-text, .hero-copy) {
   opacity: var(--a, 1); translate: 0 calc((1 - var(--a, 1)) * 14px); }
 .motion .seq .frame .plate::before { opacity: var(--a, 1); }   /* 첫 화면 글 뒤의 옅은 막도 글과 함께 */
 /* 첫 화면 → 펜촉: 종이와 펜 쪽으로 천천히 다가간다 */
@@ -361,10 +346,10 @@ html.motion { scroll-behavior: auto; }   /* 부드러운 이동은 site.js가 �
 .motion [data-reveal] .ch { opacity: 0; filter: blur(9px); transition: opacity .9s var(--ease-out), filter 1.2s var(--ease-out);
   transition-delay: calc(min(var(--i), 48) * 26ms); }
 .motion [data-reveal].in .ch { opacity: 1; filter: blur(0); }
-/* 첫 화면 종이: 만년필로 쓰듯 한 글자씩 */
-.motion [data-ink] .ch { opacity: 0; filter: blur(2.5px); transition: opacity .55s ease-out, filter .8s ease-out;
+/* 첫 화면 종이: 만년필로 쓰듯 한 글자씩(손글씨 글자 .c는 site.js가 만든다) */
+.motion [data-ink] .c { opacity: 0; filter: blur(2.5px); transition: opacity .55s ease-out, filter .8s ease-out;
   transition-delay: calc(700ms + var(--i) * 80ms); }
-.motion [data-ink].in .ch { opacity: 1; filter: blur(0); }
+.motion [data-ink].in .c { opacity: 1; filter: blur(0); }
 
 /* ── 화면에 들어올 때 떠오르기 ── */
 .motion [data-enter] { opacity: 0; translate: 0 28px; transition: opacity 1s var(--ease-out), translate 1.3s var(--ease-out); }
