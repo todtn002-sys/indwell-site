@@ -135,8 +135,9 @@ html.ov-ready .pasted { visibility: visible; }
 .statement-text { position: absolute; z-index: 1; left: 7%; top: 50%; transform: translateY(-50%); width: 58%;
   font-family: var(--serif); font-weight: 500; font-size: 4.2cqw; line-height: 1.5; color: var(--ink); }
 /* 같은 펜촉 그림 위에서 큰 문장보다 먼저 나오는 소개 글(두 장면이 같은 그림이라 글만 바뀌어 보인다) */
-.statement-sub { font-size: 2cqw; font-weight: 400; line-height: 1.9; }
-.statement-sub p + p { margin-top: 1.1em; }
+.statement-sub { top: 30%; font-size: 2cqw; font-weight: 400; line-height: 1.9; }
+/* 결론 문장은 펜촉 끝(그림 가로 70%·세로 73%의 잉크 점) 아래 빈 종이에 — 펜이 방금 쓴 문장처럼. 시작선은 위 문단과 같고 조금만 진하게 */
+.statement-end { top: auto; bottom: 8%; transform: none; font-weight: 500; }
 
 /* ── 첫 화면(장면 1) ────────────────────────────────── */
 .hero { padding-top: 28px; }
@@ -258,7 +259,8 @@ footer .mail { user-select: all; color: var(--ink); }
   /* 그림 아래 글: 화면 가장자리에 붙지 않게 양옆 여백 */
   .caption, .frame-note { padding-inline: 20px; }
   .statement-text { width: 80%; font-size: 6cqw; }
-  .statement-sub { top: 40%; width: 68%; font-size: 3.9cqw; }   /* 오른쪽 펜촉·몸통(그림 가운데 아래)에 글 끝이 닿지 않게 조금 위로 */
+  .statement-sub { top: 30%; width: 68%; font-size: 3.9cqw; }   /* 오른쪽 펜 몸통에 글 끝이 닿지 않게 */
+  .statement-end { top: auto; }
 }
 /* 휴대폰 세로에서 가로 그림의 그림판은 폭에 맞춘다(세로 화면 높이 기준 계산이 폭보다 커지지 않게) */
 @media (orientation: portrait) {
@@ -457,6 +459,7 @@ html.motion { scroll-behavior: auto; }   /* 부드러운 이동은 site.js가 �
   .hero .store svg { width: 13px; height: 13px; }
   .statement-text { font-size: 4.6cqw; }
   .statement-sub { font-size: 3.1cqw; }
+  .statement-end { bottom: 3%; line-height: 1.7; }   /* 짧은 화면에서도 펜촉 끝보다 아래에서 시작 */
 }
 @media (prefers-reduced-motion: reduce) {
   .timebar, .timebar a { transition: none; }
