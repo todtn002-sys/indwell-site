@@ -143,6 +143,8 @@ html.ov-ready .pasted { visibility: visible; }
 .hero .meaning .word { font-family: var(--latin); font-size: 30px; font-weight: 600; color: var(--gold); letter-spacing: .02em; }
 .hero .line { width: 48px; height: 1px; background: var(--gold); opacity: .6; margin-block: 24px; }
 .hero .lead { font-family: var(--serif); font-size: clamp(18px, 1.8cqw, 26px); line-height: 1.75; }
+.hero .sub { margin-top: 16px; font-size: clamp(14px, 1.1cqw, 17px); line-height: 1.85; color: var(--ink-dim); }
+.hero .sub.close { margin-top: 10px; color: var(--ink); }
 .hero .stores { margin-top: 32px; }
 
 /* ── 세 가지 글 (가는 선 격자 + 도장 문양) ──────────────── */
@@ -246,12 +248,18 @@ footer .mail { user-select: all; color: var(--ink); }
   /* 첫 화면: 세로판 그림의 위쪽 빈 벽 자리에 글과 단추를 얹는다(그림 틀 밖으로 내보내면 잘림).
      위에서 아래로 옅어지는 오트밀 막을 깔아 글이 읽히게 하고, 종이(그림 아래쪽 절반)는 가리지 않는다 */
   .hero .plate::before { background: linear-gradient(180deg, rgba(239,227,214,.94) 0%, rgba(239,227,214,.8) 34%, rgba(239,227,214,0) 50%); }
-  .hero-copy { left: 0; right: 0; top: 0; transform: none; width: auto; padding: 22px 20px 0; }
-  .hero .meaning .word { font-size: 24px; }
-  .hero .line { margin-block: 14px; }
-  .hero .lead { font-size: 17px; }
-  .hero .stores { margin-top: 18px; gap: 8px; }
-  .hero .store { padding: 9px 14px; font-size: 13px; }
+  /* 글·단추는 종이 손글씨(그림 위에서 약 47%) 위에서 끝나야 한다 — 문구가 길어 크기·간격을 조였다(2026-10-22) */
+  .hero-copy { left: 0; right: 0; top: 0; transform: none; width: auto; padding: 14px 20px 0; }
+  .hero .meaning { font-size: 13px; }
+  .hero .meaning .word { font-size: 21px; }
+  .hero .line { margin-block: 9px; }
+  .hero .lead { font-size: 16px; line-height: 1.6; }
+  .hero .sub { margin-top: 8px; font-size: 13px; line-height: 1.6; }
+  .hero .sub.close { margin-top: 4px; }
+  .hero .br-wide { display: none; }   /* 좁은 화면에서는 저절로 줄바꿈 */
+  .hero .stores { margin-top: 12px; gap: 8px; }
+  .hero .store { padding: 7px 12px; font-size: 12.5px; }
+  .hero .store svg { width: 15px; height: 15px; }
   /* 그림 아래 글: 화면 가장자리에 붙지 않게 양옆 여백 */
   .caption, .frame-note { padding-inline: 20px; }
   .statement-text { width: 80%; font-size: 6cqw; }
@@ -438,6 +446,9 @@ html.motion { scroll-behavior: auto; }   /* 부드러운 이동은 site.js가 �
   .hero .meaning { font-size: 12px; }
   .hero .line { margin-block: 10px; }
   .hero .lead { font-size: 13px; line-height: 1.6; }
+  .hero .sub { margin-top: 6px; font-size: 10.5px; line-height: 1.6; }
+  .hero .sub.close { margin-top: 3px; }
+  .hero .br-wide { display: none; }
   .hero .stores { margin-top: 12px; gap: 6px; }
   .hero .store { padding: 6px 11px; font-size: 11px; }
   .hero .store svg { width: 13px; height: 13px; }
