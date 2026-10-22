@@ -115,6 +115,10 @@ html.ov-ready .ov { visibility: visible; }
 html.ov-ready .pasted { visibility: visible; }
 .pasted picture { position: static; display: block; }   /* 그림판 배경 그림 규칙(.plate picture/img)을 사진에는 쓰지 않게 */
 .pasted img { position: static; inset: auto; display: block; width: 100%; height: auto; rotate: -2.2deg; box-shadow: 0 1px 2px rgba(40, 24, 10, .28), 0 6px 14px rgba(40, 24, 10, .18); }
+/* 종이 액자(1년 전 일기 '우산'): 사진 둘레에 크림색 종이 여백(아래를 조금 더 넓게), 결이 보이게 아주 옅은 안쪽 그늘 */
+.pasted.framed img { box-sizing: border-box; padding: 5% 5% 9%; background: #E9DCC6; rotate: 1.6deg;
+  filter: sepia(.14) brightness(.95);   /* 스탠드 불빛 아래 일기장 종이색에 맞춰 액자·사진을 조금 데운다(하얗게 떠 보이지 않게) */
+  box-shadow: inset 0 0 0 1px rgba(120, 96, 70, .12), 0 1px 2px rgba(40, 24, 10, .26), 0 7px 16px rgba(40, 24, 10, .2); }
 .ov p + p { margin-top: .55em; }
 .ov .small { font-size: .74em; opacity: .8; }
 /* 글은 '무언가 써 있다'는 느낌이 목적 — 보려고 하면 읽히는 정도로 옅고 작게(부각 금지).
