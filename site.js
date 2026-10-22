@@ -187,9 +187,12 @@ var inkReady = (function () {
       noteTargets(f).forEach(function (t) {
         var keep = t.style.translate; t.style.translate = '0px 0px';   // 나타나기 움직임(조금 내려가 있음)을 빼고 제자리에서 잰다
         var list = t.classList.contains('caption') ? [t] : [].slice.call(t.querySelectorAll('.ch'));
+        // 시각 표시(.caption)는 상자가 화면 폭 전체라, 상자로 재면 글자 없는 오른쪽 밝기까지 섞인다 → 글자가 실제 놓인 자리만 잰다
+        // (2026-10-22 첫 화면 '07:00 · 책상'이 어두운 나무 위인데 먹색이 골라져 안 보였음)
+        function box(el) { if (el !== t || !t.classList.contains('caption')) return el.getBoundingClientRect(); var rg = document.createRange(); rg.selectNodeContents(el); return rg.getBoundingClientRect(); }
         list.band = f.hasAttribute('data-note-band') ? BAND_A : 0;
         list.forEach(function (ch) {
-          var b = ch.getBoundingClientRect(), x0 = (b.left - pr.left) * S, y0 = (b.top - pr.top) * S, x1 = (b.right - pr.left) * S, y1 = (b.bottom - pr.top) * S;
+          var b = box(ch), x0 = (b.left - pr.left) * S, y0 = (b.top - pr.top) * S, x1 = (b.right - pr.left) * S, y1 = (b.bottom - pr.top) * S;
           ch._L = seq._px.map(function (px) {
             if (!px) return null;
             var L = [];

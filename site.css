@@ -122,7 +122,7 @@ html.ov-ready .pasted { visibility: visible; }
 .ov[data-pen="fountain"]  { color: rgba(30, 40, 82, .58);  filter: blur(.2px); }  /* 남색 만년필 잉크 */
 .ov[data-pen="ballpoint"] { color: rgba(30, 34, 52, .55);  filter: blur(.15px); }                                           /* 검정 볼펜 */
 .ov[data-pen="pencil"]    { color: rgba(80, 80, 84, .5);   filter: blur(.25px); }                                          /* 연필(흑연) */
-.ov[data-pen="faded"]     { color: rgba(100, 68, 44, .46); filter: blur(.25px); }                                          /* 오래되어 바랜 잉크 */
+.ov[data-pen="faded"]     { color: rgba(66, 40, 24, .72);  filter: blur(.1px); }                                            /* 오래되어 바랜 잉크 */
 /* 천 표지에 찍힌 금박 제목: 손글씨가 아니라 찍어 누른 글자라 본명조, 곱하기 대신 빛나는 금색 + 눌린 그림자 */
 .ov[data-pen="foil"] { font-family: var(--serif); font-weight: 600; letter-spacing: .08em; text-align: center; white-space: nowrap;
   color: rgba(217, 182, 118, .9); mix-blend-mode: normal; filter: none; text-shadow: 0 1px 0 rgba(0, 0, 0, .45), 0 -.5px 0 rgba(255, 236, 190, .35); }
