@@ -14,7 +14,8 @@
     bar.setAttribute('aria-hidden', on ? 'false' : 'true');
     bar.querySelectorAll('a').forEach(function (a) { a.tabIndex = on ? 0 : -1; });
   }
-  new IntersectionObserver(function (es) { setShown(!es[0].isIntersecting); }).observe(top);
+  // 맨 위 메뉴가 띠 높이만큼 밑으로 들어가는 순간 띠가 이어받는다(완전히 사라질 때까지 기다리면 그 사이 빈 줄이 보였다 — 2026-10-23)
+  new IntersectionObserver(function (es) { setShown(!es[0].isIntersecting); }, { rootMargin: '-' + bar.offsetHeight + 'px 0px 0px 0px' }).observe(top);
 })();
 
 // ── 사용법 창 ──

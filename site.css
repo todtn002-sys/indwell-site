@@ -396,6 +396,14 @@ html.motion { scroll-behavior: auto; }   /* 부드러운 이동은 site.js가 �
   .motion .seq { height: calc(100lvh + (var(--n, 1) - 1) * 85svh); }
   .motion .seq-stick { height: 100lvh; padding: calc(61px + env(safe-area-inset-top, 0px) + 6px) 0 calc(max(18px, env(safe-area-inset-bottom, 0px)) + 64px + (100lvh - 100svh));
     grid-template: 1fr / 1fr; align-items: center; justify-items: stretch; }
+  /* 첫 장면은 그림이 로고 밑 경계선 바로 아래부터 채운다(메뉴 줄 '소개·사용법·자주 묻는 질문'은 그림 위에 얹힘).
+     붙잡힐 때는 따라오는 메뉴 띠 바로 아래(top)에 붙으므로 위 padding으로 띠 자리를 비워 둘 필요가 없다 —
+     비워 두면 페이지 맨 위에서 그 자리가 빈 여백으로 보였다(2026-10-23 사용자 지적) */
+  .topbar { position: relative; z-index: 3; }
+  .motion .hero { padding-top: 0; margin-top: -44px; }   /* 44 = 메뉴 줄 높이(경계선 1 + 위 여백 8 + 글줄 35) */
+  .motion .hero .seq-stick { top: calc(61px + env(safe-area-inset-top, 0px)); height: calc(100lvh - 61px - env(safe-area-inset-top, 0px));
+    padding-top: 0; align-items: start; }
+  .motion .hero .hero-copy { padding-top: 58px; }   /* 메뉴 줄 아래에서 글 시작 */
   .motion .seq .frame { position: relative; }
   /* 틀 모양 = 세로판과 같은 2:3(세로판 그림은 잘리지 않고, 가로 그림만 --focus 중심으로 잘린다). 화면이 짧으면 높이에 맞춰 조금 잘린다.
      높이 상한 = 주소창이 펼쳐진 화면(svh)에서 메뉴 띠·시간 버튼을 뺀 자리 */
