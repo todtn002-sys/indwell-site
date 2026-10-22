@@ -113,7 +113,10 @@ var inkReady = (function () {
     var img = plate.querySelector(':scope > picture > img'), pos = [50, 50];
     if (img) pos = getComputedStyle(img).objectPosition.split(' ').map(function (v) { return v.indexOf('%') > 0 ? parseFloat(v) : 50; });
     var k = Math.max(W / iw, H / ih), dw = iw * k, dh = ih * k;
-    return { x: (W - dw) * pos[0] / 100, y: (H - dh) * pos[1] / 100, w: dw, h: dh };
+    // 그림을 CSS translate로 옮긴 장면(휴대폰 첫 화면)은 그만큼 더한다 — 손글씨·설명 글·글자 색 계산이 모두 이 값을 쓴다
+    // (브라우저가 '0px 8%'처럼 %를 그대로 돌려주므로 %는 그림 자신의 크기로 바꾼다)
+    var t = img ? getComputedStyle(img).translate.split(' ').map(function (v, i) { return parseFloat(v) * (v.indexOf('%') > 0 ? (i ? img.offsetHeight : img.offsetWidth) / 100 : 1); }) : [];
+    return { x: (W - dw) * pos[0] / 100 + (t[0] || 0), y: (H - dh) * pos[1] / 100 + (t[1] || 0), w: dw, h: dh };
   }
   function layout(el) {
     var plate = el.closest('.plate'), W = plate.clientWidth, H = plate.clientHeight;

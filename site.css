@@ -247,9 +247,12 @@ footer .mail { user-select: all; color: var(--ink); }
   .has-p .caption, .has-p .frame-note { aspect-ratio: auto; }
   /* 첫 화면: 세로판 그림의 위쪽 빈 벽 자리에 글과 단추를 얹는다(그림 틀 밖으로 내보내면 잘림).
      위에서 아래로 옅어지는 오트밀 막을 깔아 글이 읽히게 하고, 종이(그림 아래쪽 절반)는 가리지 않는다 */
-  .hero .plate::before { background: linear-gradient(180deg, rgba(239,227,214,.94) 0%, rgba(239,227,214,.8) 34%, rgba(239,227,214,0) 50%); }
+  .hero .plate::before { background: linear-gradient(180deg, rgba(239,227,214,1) 0%, rgba(239,227,214,1) 9%, rgba(239,227,214,.8) 40%, rgba(239,227,214,0) 56%); }   /* 맨 위 9%는 불투명 — 아래로 내린 그림 위 빈자리(8%)의 경계가 안 보이게 */
   /* 글·단추는 종이 손글씨(그림 위에서 약 47%) 위에서 끝나야 한다 — 문구가 길어 크기·간격을 조였다(2026-10-22) */
   .hero-copy { left: 0; right: 0; top: 0; transform: none; width: auto; padding: 14px 20px 0; }
+  /* 글이 길어 종이를 그림 높이의 8%만큼 아래로 내린다(위 빈자리는 오트밀 막 아래로 가려짐, 아래 나무 끝이 그만큼 잘림).
+     % = 그림 자신의 높이 = 틀 높이. site.js drawn()이 이 값을 읽어 손글씨·설명 글 자리를 함께 옮긴다 */
+  .hero .plate > picture > img { translate: 0 8%; }
   .hero .meaning { font-size: 13px; }
   .hero .meaning .word { font-size: 21px; }
   .hero .line { margin-block: 9px; }
