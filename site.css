@@ -195,7 +195,10 @@ html.ov-ready .pasted { visibility: visible; }
 .finale .lead-in { color: #B9AE9C; }
 .finale .gap { display: block; height: .5em; }
 .finale .stores { justify-content: center; }
-.motion .quiet { background: var(--oat); }   /* 밤 막 위에 오트밀을 덮어 밤과의 경계를 또렷하게 */
+.motion .quiet { background: var(--oat); }   /* 밤 막 위에 오트밀을 덮는다 */
+/* 밤 → 오트밀은 칼로 자르듯 바뀌지 않게: 첫 구역(둘러보기) 위에 화면 0.7장 높이의 여백을 두고 그 안에서 남색이 서서히 밝아진다.
+   글은 그 여백이 끝난 뒤(완전한 오트밀 위)에서 시작하므로 중간 색 위에 글이 놓이지 않는다 */
+.motion .quiet.shots { padding-top: calc(70svh + 72px); background: linear-gradient(180deg, var(--night) 0, var(--oat) 70svh, var(--oat) 100%); }
 .finale .price-note { margin: 22px auto 0; max-width: 34em; font-size: 14px; line-height: 1.8; color: #B9AE9C; }
 .night .store.primary { background: var(--night-ink); border-color: var(--night-ink); color: var(--night); }
 .night .store.soon { color: #B9AE9C; border-color: rgba(237,227,204,.3); }

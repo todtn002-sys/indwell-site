@@ -377,8 +377,8 @@ if (MOTION) (function () {
   var root = document.documentElement, night = document.getElementById('s5'), dawn = document.querySelector('.quiet');
   onScroll(function () {
     var vh = innerHeight;
-    // 걷힘은 조용한 구역(오트밀 바탕 .quiet)이 화면 위 30% 자리를 지나는 동안 — 경계는 또렷하게 두고 바탕(주소창 뒤 색)만 뒤따라 바뀐다
-    var o = ease((vh * .85 - night.getBoundingClientRect().top) / (vh * .6)) * (1 - ease((vh * .3 - dawn.getBoundingClientRect().top) / (vh * .3)));
+    // 걷힘은 조용한 구역 맨 위의 '남색→오트밀 여백'(site.css .quiet.shots, 화면 0.7장)이 화면을 지나가는 동안 함께 — 바탕(주소창 뒤 색)도 서서히 밝아진다
+    var o = ease((vh * .85 - night.getBoundingClientRect().top) / (vh * .6)) * (1 - ease((vh * .7 - dawn.getBoundingClientRect().top) / (vh * 1.1)));
     root.style.setProperty('--night-o', Math.round(o * 1000) / 1000);   // 밤 막(.nightfall)과 바탕(body)이 함께 읽는다
   });
 })();
