@@ -216,6 +216,15 @@ h2 { font-size: clamp(24px, 5.6vw, 32px); line-height: 1.45; margin-top: 10px; }
 .faq summary::after { content: "＋"; color: var(--ink-dim); }
 .faq details[open] summary::after { content: "－"; }
 .faq details p { margin-top: 10px; color: var(--ink-dim); font-size: 15px; max-width: 34em; }
+/* 맨 끝 조용한 구역(둘러보기·개인정보·질문)은 밤 바탕 위 — 같은 글자색 이름을 밤 색으로 바꿔 끼운다 */
+.quiet { --ink: var(--night-ink); --ink-dim: #B9AE9C; --rule: rgba(237, 227, 204, .16); --gold: #C9A86A; }
+.quiet .gallery img { box-shadow: 0 8px 24px rgba(0, 0, 0, .35); }
+/* 세 걸음: 실제 앱 화면 셋을 한 줄로 작게, 사이에 → */
+.steps { padding-block: 56px 8px; }
+.steps .phones { display: grid; grid-template-columns: repeat(3, minmax(0, 220px)); justify-content: center; gap: 28px; margin-top: 0; }
+.steps .phone { width: auto; position: relative; }
+.steps .phone + .phone::before { content: "→"; position: absolute; left: -22px; top: 46%; color: var(--gold); font-size: 15px; }
+.steps .phone figcaption { font-family: var(--serif); font-size: 16px; font-weight: 600; color: var(--ink); }
 
 /* ── 사용 설명서 창 — 앱 설명서 카드와 같은 위계(장 제목·소제목·본문·왼쪽 선 강조문) ── */
 .guide { width: min(720px, 100% - 24px); max-width: none; max-height: min(88vh, 100% - 24px); padding: 0; border: 1px solid var(--rule); border-radius: 18px; background: var(--card); color: var(--ink); box-shadow: 0 30px 80px rgba(59,42,32,.25); overflow: hidden; }
@@ -263,6 +272,12 @@ footer .mail { user-select: all; color: var(--ink); }
   /* 그림 아래 글: 화면 가장자리에 붙지 않게 양옆 여백 */
   .caption, .frame-note { padding-inline: 20px; }
   .statement-text { width: 80%; font-size: 6cqw; }
+  .steps { padding-block: 40px 0; }
+  .steps .phones { gap: 14px; }
+  .steps .phone + .phone::before { left: -12px; font-size: 12px; }
+  .steps .phone .bezel { padding: 4px; border-radius: 20px; }
+  .steps .phone img { border-radius: 16px; }
+  .steps .phone figcaption { font-size: 14px; margin-top: 8px; }
   .statement-sub { top: 30%; width: 68%; font-size: 3.9cqw; }   /* 오른쪽 펜 몸통에 글 끝이 닿지 않게 */
   .statement-end { top: auto; }
 }

@@ -25,8 +25,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Nanum+Pen+Script&family=Noto+Serif+KR:wght@400;500;600&display=swap">
 <link rel="preload" href="fonts/indwell-title-regular.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="site.css?v=20261023v">
-<script src="site.js?v=20261023v" defer></script>
+<link rel="stylesheet" href="site.css?v=20261023w">
+<script src="site.js?v=20261023w" defer></script>
 <!-- 움직임을 쓸지 정하는 단 한 곳: 기기의 '움직임 줄이기'가 꺼져 있을 때만 .motion을 붙인다.
      그림이 그려지기 전에 정해야 멈춘 화면이 잠깐 보였다 바뀌는 깜빡임이 없다. 나머지 판단은 모두 이 표시를 따른다 -->
 <script>if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('motion');</script>
@@ -117,6 +117,15 @@
 </header>
 
 <main>
+  <!-- ── 세 걸음: 처음 보는 사람이 앱의 흐름(지금 적고 → 키우고 → 다시 만난다)을 실제 화면으로 먼저 보게 ── -->
+  <section class="steps">
+    <div class="wrap phones" data-enter>
+      <figure class="phone"><div class="bezel"><picture><source type="image/avif" srcset="img/app/desk.avif"><img src="img/app/desk.jpg" alt="Indwell 책상 화면: 포스트잇 여섯 장" loading="lazy" decoding="async"></picture></div><figcaption>지금 적고</figcaption></figure>
+      <figure class="phone"><div class="bezel"><picture><source type="image/avif" srcset="img/app/writing.avif"><img src="img/app/writing.jpg" alt="Indwell 작성창 화면" loading="lazy" decoding="async"></picture></div><figcaption>키우고</figcaption></figure>
+      <figure class="phone"><div class="bezel"><picture><source type="image/avif" srcset="img/app/returned-popup.avif"><img src="img/app/returned-popup.jpg" alt="Indwell 돌아온 글 화면" loading="lazy" decoding="async"></picture></div><figcaption>다시 만난다</figcaption></figure>
+    </div>
+  </section>
+
   <!-- ── 왜 Indwell인가 · 세 가지 글 ── -->
   <section class="intro">
     <div class="wrap">
@@ -380,54 +389,6 @@
     </div>
   </section>
 
-  <!-- ── 조용한 구역: 둘러보기·개인정보·자주 묻는 질문 (예전 문구 그대로) ── -->
-  <section class="shots">
-    <div class="wrap">
-      <p class="eyebrow">둘러보기</p>
-      <h2>책상에서 서재까지</h2>
-      <div class="gallery" tabindex="0" aria-label="앱 화면 8장">
-        <img src="img/screen-1.jpg" alt="조용한 책상 화면" loading="lazy">
-        <img src="img/screen-2.jpg" alt="포스트잇이 붙은 책상 화면" loading="lazy">
-        <img src="img/screen-3.jpg" alt="작성창 화면" loading="lazy">
-        <img src="img/screen-4.jpg" alt="포스트잇을 단상이나 책으로 가져가는 과정" loading="lazy">
-        <img src="img/screen-5.jpg" alt="돌아온 글 화면" loading="lazy">
-        <img src="img/screen-6.jpg" alt="글들이 쌓여 책이 되는 과정" loading="lazy">
-        <img src="img/screen-7.jpg" alt="책 상세 화면" loading="lazy">
-        <img src="img/screen-8.jpg" alt="내 서재 화면" loading="lazy">
-      </div>
-      <p class="hint">옆으로 넘겨 보세요 →</p>
-    </div>
-  </section>
-
-  <section>
-    <div class="wrap split">
-      <div>
-        <p class="eyebrow">개인정보</p>
-        <h2>당신의 글은<br>당신에게만 있습니다</h2>
-      </div>
-      <ul class="privacy-list">
-        <li><b>계정도, 서버도 없습니다</b><span>글·포스트잇·설정은 모두 휴대폰 안에 저장되며 개발자도 볼 수 없습니다.</span><span>온전히 자신 안에서 깊어지는 공간으로 사용할 수 있습니다.</span></li>
-        <li><b>사유의 확장을 구조적으로 돕습니다</b><span>포스트잇 → 단상 → 책 순으로 맥락을 확장해 갈 수 있는 시스템을 만들었습니다.</span></li>
-        <li><b>앱 잠금</b><span>지문·얼굴 인식 또는 기기 비밀번호로 앱을 잠글 수 있습니다.</span></li>
-        <li><b>백업과 내보내기</b><span>쓰신 글은 백업 파일 하나로 내보내고 가져옵니다. 개인 드라이브나 클라우드에 넣어서 보관해주세요. 책과 단상은 PDF로 내보낼 수 있습니다.</span></li>
-      </ul>
-    </div>
-  </section>
-  <section id="faq">
-    <div class="wrap split">
-      <div>
-        <p class="eyebrow">자주 묻는 질문</p>
-        <h2>궁금한 점</h2>
-      </div>
-      <div class="faq">
-        <details><summary>휴대폰을 바꾸면 글은 어떻게 옮기나요?</summary><p>환경설정의 백업에서 백업 파일을 내보낸 뒤, 새 휴대폰의 Indwell에서 그 파일을 가져오면 됩니다.</p></details>
-        <details><summary>앱을 지우면 글도 사라지나요?</summary><p>네. 글은 휴대폰 안에만 저장되기 때문에 앱을 지우면 함께 사라집니다. 지우기 전에 꼭 백업 파일을 내보내 개인 드라이브나 클라우드에 보관해 주세요.</p></details>
-        <details><summary>개발자가 제 글을 볼 수 있나요?</summary><p>볼 수 없습니다. 계정도 서버도 없어서 글이 휴대폰 밖으로 나가지 않습니다.</p><p>로그인 기능을 별도로 넣지 않았기에 개인정보나 비밀한 내용 등이 외부로 유출될 일이 없습니다. 자유롭게 이용하실 개인 공간으로 여기시면 되겠습니다.</p></details>
-        <details><summary>작성창과 읽기 전용이 왜 따로 있나요?</summary><p>작성창은 사용자가 글을 쓰는 것에 집중할 수 있게 고안된 곳이며, ‘읽기 전용’은 읽는 것에 집중할 수 있도록 고안된 기능입니다. 이 둘을 서로 직접적으로 오가지는 않지만 나중에 수정에 필요한 부분을 놓치지 않기 위해 읽기 전용 기능에도 단어별 마킹 기능을 구현해 놓았습니다.</p></details>
-      </div>
-    </div>
-  </section>
-
   <!-- ── 장면 5 · 21:00 하루를 남기다 (일기) ── -->
   <section class="scene night" id="s5">
     <div class="wrap scene-head" data-enter>
@@ -521,6 +482,53 @@
       <div class="stores">
         <a class="store primary" href="https://apps.apple.com/app/id6810987473" target="_blank" rel="noopener">App Store에서 받기</a>
         <span class="store soon" aria-disabled="true">Google Play · 곧 출시</span>
+      </div>
+    </div>
+  </section>
+  <!-- ── 조용한 구역: 둘러보기·개인정보·자주 묻는 질문 — 하루(07:00→23:00)를 다 본 뒤 맨 끝에. 밤 바탕 위라 .quiet로 글자색을 밤에 맞춤 ── -->
+  <section class="shots quiet night">
+    <div class="wrap">
+      <p class="eyebrow">둘러보기</p>
+      <h2>책상에서 서재까지</h2>
+      <div class="gallery" tabindex="0" aria-label="앱 화면 8장">
+        <img src="img/screen-1.jpg" alt="조용한 책상 화면" loading="lazy">
+        <img src="img/screen-2.jpg" alt="포스트잇이 붙은 책상 화면" loading="lazy">
+        <img src="img/screen-3.jpg" alt="작성창 화면" loading="lazy">
+        <img src="img/screen-4.jpg" alt="포스트잇을 단상이나 책으로 가져가는 과정" loading="lazy">
+        <img src="img/screen-5.jpg" alt="돌아온 글 화면" loading="lazy">
+        <img src="img/screen-6.jpg" alt="글들이 쌓여 책이 되는 과정" loading="lazy">
+        <img src="img/screen-7.jpg" alt="책 상세 화면" loading="lazy">
+        <img src="img/screen-8.jpg" alt="내 서재 화면" loading="lazy">
+      </div>
+      <p class="hint">옆으로 넘겨 보세요 →</p>
+    </div>
+  </section>
+
+  <section class="quiet night">
+    <div class="wrap split">
+      <div>
+        <p class="eyebrow">개인정보</p>
+        <h2>당신의 글은<br>당신에게만 있습니다</h2>
+      </div>
+      <ul class="privacy-list">
+        <li><b>계정도, 서버도 없습니다</b><span>글·포스트잇·설정은 모두 휴대폰 안에 저장되며 개발자도 볼 수 없습니다.</span><span>온전히 자신 안에서 깊어지는 공간으로 사용할 수 있습니다.</span></li>
+        <li><b>사유의 확장을 구조적으로 돕습니다</b><span>포스트잇 → 단상 → 책 순으로 맥락을 확장해 갈 수 있는 시스템을 만들었습니다.</span></li>
+        <li><b>앱 잠금</b><span>지문·얼굴 인식 또는 기기 비밀번호로 앱을 잠글 수 있습니다.</span></li>
+        <li><b>백업과 내보내기</b><span>쓰신 글은 백업 파일 하나로 내보내고 가져옵니다. 개인 드라이브나 클라우드에 넣어서 보관해주세요. 책과 단상은 PDF로 내보낼 수 있습니다.</span></li>
+      </ul>
+    </div>
+  </section>
+  <section id="faq" class="quiet night">
+    <div class="wrap split">
+      <div>
+        <p class="eyebrow">자주 묻는 질문</p>
+        <h2>궁금한 점</h2>
+      </div>
+      <div class="faq">
+        <details><summary>휴대폰을 바꾸면 글은 어떻게 옮기나요?</summary><p>환경설정의 백업에서 백업 파일을 내보낸 뒤, 새 휴대폰의 Indwell에서 그 파일을 가져오면 됩니다.</p></details>
+        <details><summary>앱을 지우면 글도 사라지나요?</summary><p>네. 글은 휴대폰 안에만 저장되기 때문에 앱을 지우면 함께 사라집니다. 지우기 전에 꼭 백업 파일을 내보내 개인 드라이브나 클라우드에 보관해 주세요.</p></details>
+        <details><summary>개발자가 제 글을 볼 수 있나요?</summary><p>볼 수 없습니다. 계정도 서버도 없어서 글이 휴대폰 밖으로 나가지 않습니다.</p><p>로그인 기능을 별도로 넣지 않았기에 개인정보나 비밀한 내용 등이 외부로 유출될 일이 없습니다. 자유롭게 이용하실 개인 공간으로 여기시면 되겠습니다.</p></details>
+        <details><summary>작성창과 읽기 전용이 왜 따로 있나요?</summary><p>작성창은 사용자가 글을 쓰는 것에 집중할 수 있게 고안된 곳이며, ‘읽기 전용’은 읽는 것에 집중할 수 있도록 고안된 기능입니다. 이 둘을 서로 직접적으로 오가지는 않지만 나중에 수정에 필요한 부분을 놓치지 않기 위해 읽기 전용 기능에도 단어별 마킹 기능을 구현해 놓았습니다.</p></details>
       </div>
     </div>
   </section>
