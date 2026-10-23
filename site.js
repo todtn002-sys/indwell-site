@@ -346,7 +346,8 @@ if (MOTION) (function () {
   var seqs = [].slice.call(document.querySelectorAll('.seq')).map(function (el) {
     var frames = [].slice.call(el.querySelectorAll(':scope > .seq-stick > .frame'));
     el.style.setProperty('--n', frames.length);
-    return { el: el, frames: frames, last: [] };
+    var hold = +(el.dataset.hold || 0); if (hold) el.style.setProperty('--hold', hold);
+    return { el: el, frames: frames, hold: hold, last: [] };
   });
   function set(f, k, v, cache, idx) {   // 값이 바뀔 때만 써서 불필요한 다시 그리기를 줄인다
     var key = idx + k; v = Math.round(v * 1000) / 1000;
@@ -357,8 +358,7 @@ if (MOTION) (function () {
     seqs.forEach(function (s) {
       var r = s.el.getBoundingClientRect();
       if (r.bottom < -vh || r.top > vh * 2) return;   // 멀리 있는 묶음은 계산하지 않음
-      // 묶음 끝의 HOLD(그림 0.7칸)만큼은 마지막 그림이 그대로 머문다 — site.css .seq 높이의 '+ .7'과 같은 값
-      var HOLD = .7, q = clamp01(-r.top / Math.max(1, r.height - vh)), t = Math.min(n - 1, q * (n - 1 + HOLD)), p = n > 1 ? t / (n - 1) : q, best = 0, bestA = -1;
+      var n = s.frames.length, p = clamp01(-r.top / Math.max(1, r.height - vh)), t = Math.min(n - 1, p * (n - 1 + s.hold)), best = 0, bestA = -1;   // 끝의 hold 구간은 마지막 그림 그대로
       s.frames.forEach(function (f, i) {
         var inn = i === 0 ? 1 : ease((t - (i - 1) - .25) / .5);
         var txtIn = i === 0 ? 1 : ease((t - (i - 1) - .55) / .3);   // 앞 글이 다 사라진 뒤에 나타나도록

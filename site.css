@@ -330,8 +330,8 @@ html.motion { scroll-behavior: auto; }   /* 부드러운 이동은 site.js가 �
 
 /* ── 장면 묶음: 화면에 붙잡아 두고 같은 자리에서 그림을 겹쳐 바꾼다 ── */
 /* 묶음 높이 = 화면 1장 + 그림 하나 바뀔 때마다 화면 0.85장 */
-/* 묶음 길이 = 화면 1장 + 그림 사이마다 0.85장 + 마지막 그림이 머무는 0.7장(site.js HOLD와 같은 값). 머무는 구간이 없으면 마지막 그림이 덮이자마자 지나가 버렸다(2026-10-24) */
-.motion .seq { position: relative; height: calc(100svh + (var(--n, 1) - 1 + .7) * 85svh); }
+.motion .seq { position: relative; height: calc(100svh + (var(--n, 1) - 1 + var(--hold, 0)) * 85svh); }
+/* data-hold="x": 그 묶음만 마지막 그림이 x칸(0.85장 × x) 더 머문다 — 덮이자마자 지나가던 책 표지·책장 서재만(2026-10-24 사용자 요청). 값은 site.js가 --hold로 넣는다 */
 .motion .seq-stick { position: sticky; top: 0; height: 100svh; padding-top: calc(var(--bar) + 20px); padding-bottom: 64px; display: grid; align-items: start; justify-items: center; overflow: hidden; }
 /* ↑ 아래 64 = 시간 단추 자리. 그림들을 위쪽 기준으로 맞춘다 — 장마다 아래 글 길이가 달라도 겹치는 그림이 같은 자리에 놓이게 */
 .motion .seq .frame { grid-area: 1 / 1; margin: 0; width: 100%; pointer-events: none; }   /* --txt는 그림 아래 글에 남길 높이(그림판 크기 계산에만 씀) */
@@ -418,7 +418,7 @@ html.motion { scroll-behavior: auto; }   /* 부드러운 이동은 site.js가 �
      위 = 따라오는 메뉴 띠(61px) + 아이폰 상태 표시줄(safe-area). 아래는 화면 끝까지 그림으로 채운다 —
      높이를 100lvh(주소창이 접혔을 때의 큰 화면)로 잡아야 주소창이 접혀도 그림 아래에 빈 띠가 생기지 않는다.
      (100dvh는 스크롤 중 주소창이 접힐 때마다 높이가 바뀌어 그림이 출렁이므로 쓰지 않는다) */
-  .motion .seq { height: calc(100lvh + (var(--n, 1) - 1 + .7) * 85svh); }
+  .motion .seq { height: calc(100lvh + (var(--n, 1) - 1 + var(--hold, 0)) * 85svh); }
   .motion .seq-stick { height: 100lvh; padding: calc(61px + env(safe-area-inset-top, 0px) + 6px) 0 calc(max(18px, env(safe-area-inset-bottom, 0px)) + 64px + (100lvh - 100svh));
     grid-template: 1fr / 1fr; align-items: center; justify-items: stretch; }
   /* 첫 장면: 맨 위에서는 그림이 로고 밑 경계선 바로 아래부터 채우고(메뉴 줄 '소개·사용법·자주 묻는 질문'은 그림 위에 얹힘),
@@ -456,7 +456,7 @@ html.motion { scroll-behavior: auto; }   /* 부드러운 이동은 site.js가 �
   /* 높이 기준 = 100lvh(주소창이 접힌 큰 화면) — 세로 화면과 같은 방식. 100svh로 잡으면 가로에서는 주소창 자리(약 100pt)만큼
      그림이 늘 작아진다(2026-10-22 아이폰 가로에서 그림 폭이 화면의 30%). 주소창이 펼쳐진 동안엔 그림 아래가 잠깐 가릴 수 있다 */
   :root { --plate-w: min(100vw - 340px, calc((100lvh - 61px - 50px - 10px) * 1.5)); }
-  .motion .seq { height: calc(100lvh + (var(--n, 1) - 1 + .7) * 85svh); }
+  .motion .seq { height: calc(100lvh + (var(--n, 1) - 1 + var(--hold, 0)) * 85svh); }
   .timebar { font-size: 11px; letter-spacing: .02em; bottom: 6px; }
   .timebar a { padding: 4px 9px; }
   .motion .seq-stick { height: 100lvh; padding: calc(61px + 5px) 0 50px; align-items: center; }
