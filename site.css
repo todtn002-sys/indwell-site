@@ -201,8 +201,8 @@ html.ov-ready .pasted { visibility: visible; }
 .motion .quiet.shots { padding-top: calc(70svh + 72px); background: linear-gradient(180deg, var(--night) 0, var(--oat) 70svh, var(--oat) 100%); }
 .shelf-photo { margin-top: 36px; margin-bottom: 56px; }
 /* 직접 찍은 사진은 실내 조명이라 하얗다 — 앞뒤 오후 햇빛 그림과 어울리게 아주 조금 데운다 */
-.shelf-photo img { display: block; width: min(100%, calc((100svh - 140px) * 1.5)); height: auto; margin-inline: auto; border-radius: 6px; filter: sepia(.16) saturate(.92) brightness(.98);
-  box-shadow: 0 18px 40px rgba(59, 42, 32, .16); }   /* 짧은 가로 화면에서도 잘리지 않게 폭을 화면 높이에 맞춰 줄인다 */
+.shelf-photo img { display: block; width: 100%; height: auto; border-radius: 6px; filter: sepia(.16) saturate(.92) brightness(.98);
+  box-shadow: 0 18px 40px rgba(59, 42, 32, .16); }   /* 붙잡히는 장면이 아니라 그냥 놓인 사진이라, 가로 화면에서도 폭을 꽉 채우고 스크롤로 본다 */
 .finale .price-note { margin: 22px auto 0; max-width: 34em; font-size: 14px; line-height: 1.8; color: #B9AE9C; }
 .night .store.primary { background: var(--night-ink); border-color: var(--night-ink); color: var(--night); }
 .night .store.soon { color: #B9AE9C; border-color: rgba(237,227,204,.3); }

@@ -25,8 +25,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Nanum+Pen+Script&family=Noto+Serif+KR:wght@400;500;600&display=swap">
 <link rel="preload" href="fonts/indwell-title-regular.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="site.css?v=20261024b">
-<script src="site.js?v=20261024b" defer></script>
+<link rel="stylesheet" href="site.css?v=20261024c">
+<script src="site.js?v=20261024c" defer></script>
 <!-- 움직임을 쓸지 정하는 단 한 곳: 기기의 '움직임 줄이기'가 꺼져 있을 때만 .motion을 붙인다.
      그림이 그려지기 전에 정해야 멈춘 화면이 잠깐 보였다 바뀌는 깜빡임이 없다. 나머지 판단은 모두 이 표시를 따른다 -->
 <script>if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('motion');</script>
@@ -302,34 +302,6 @@
     <div class="wrap shelf-photo" id="review-shelf" data-enter>
       <picture><source type="image/avif" srcset="img/scenes/review-shelf-960.avif 960w, img/scenes/review-shelf-1536.avif 1536w" sizes="(min-width: 1100px) 1040px, 100vw"><img src="img/scenes/review-shelf.jpg" width="1536" height="1024" alt="책장에서 책 한 권을 꺼내는 손 — 몰입, 사피엔스, 넥서스, 총균쇠, 자본론이 꽂힌 책장" loading="lazy" decoding="async"></picture>
     </div>
-    <div class="seq"><div class="seq-stick">
-    <figure class="frame f-review has-p" data-note-y="89">
-      <div class="plate">
-        <picture>
-          <source media="(max-width: 700px) and (orientation: portrait)" type="image/avif" srcset="img/scenes/30-review-spring-p-1024.avif">
-          <source media="(max-width: 700px) and (orientation: portrait)" srcset="img/scenes/30-review-spring-p.jpg">
-          <source type="image/avif" srcset="img/scenes/27-review-spring-960.avif 960w, img/scenes/27-review-spring-1536.avif 1536w" sizes="(min-width: 1600px) 1536px, 100vw">
-          <img src="img/scenes/27-review-spring.jpg" width="1536" height="1024" alt="봄빛이 드는 책상 위의 다 읽은 책과 펼친 독후감 노트" loading="lazy" decoding="async">
-        </picture>
-        <div class="ov left" data-quad="38.75,21.6 61.9,21.1 61.9,70.8 38.25,70.8" data-quad-p="9.2,41.7 49.3,41.5 49.3,78.5 8.6,78.5" data-pen="pencil" data-pad="12 12 12 14" data-fs="17"><p>데미안을 읽고</p><p class="small">헤르만 헤세 · 1차</p></div>
-        <div class="ov right" data-quad="62.1,21.1 87.85,21.7 88.25,70.8 62.1,70.8" data-quad-p="50.1,41.5 92.2,41.7 92.9,78.5 50.1,78.5" data-pen="pencil" data-pad="10 12 10 10" data-fs="16"><p>알을 깨고 나온다는 말이 처음엔 용기처럼 들렸다. 나도 언젠가 무언가를 깨고 나가야 한다고 믿었다.</p></div>
-      </div>
-      <figcaption class="caption">봄</figcaption>
-    </figure>
-    <figure class="frame f-review has-p" data-note-y="89">
-      <div class="plate">
-        <picture>
-          <source media="(max-width: 700px) and (orientation: portrait)" type="image/avif" srcset="img/scenes/31-review-winter-p-1024.avif">
-          <source media="(max-width: 700px) and (orientation: portrait)" srcset="img/scenes/31-review-winter-p.jpg">
-          <source type="image/avif" srcset="img/scenes/28-review-winter-960.avif 960w, img/scenes/28-review-winter-1536.avif 1536w" sizes="(min-width: 1600px) 1536px, 100vw">
-          <img src="img/scenes/28-review-winter.jpg" width="1536" height="1024" alt="몇 해 뒤 겨울빛이 드는 같은 책상의 같은 책과 노트" loading="lazy" decoding="async">
-        </picture>
-        <div class="ov left" data-quad="38.75,21.6 61.9,21.1 61.9,70.8 38.25,70.8" data-quad-p="9.2,41.7 49.3,41.5 49.3,78.5 8.6,78.5" data-pen="pencil" data-pad="12 12 12 14" data-fs="17"><p>데미안을 읽고, 2차 독후감</p><p class="small">헤르만 헤세 · 2차</p></div>
-        <div class="ov right" data-quad="62.1,21.1 87.85,21.7 88.25,70.8 62.1,70.8" data-quad-p="50.1,41.5 92.2,41.7 92.9,78.5 50.1,78.5" data-pen="pencil" data-pad="10 12 10 10" data-fs="16"><p>다시 읽으니 깨는 일보다 그 안에 머물렀던 시간이 먼저 보인다. 껍질 안의 시간도 나를 키웠다.</p></div>
-      </div>
-      <figcaption class="caption">몇 해 뒤, 겨울</figcaption>
-    </figure>
-    </div></div>
     <div class="wrap phones" data-enter>
       <figure class="phone"><div class="bezel"><picture><source type="image/avif" srcset="img/app/review-list.avif?v=2"><img src="img/app/review-list.jpg?v=2" alt="Indwell 독후감 목록 화면" loading="lazy" decoding="async"></picture></div><figcaption>독후감 목록</figcaption></figure>
       <figure class="phone"><div class="bezel"><picture><source type="image/avif" srcset="img/app/review-book.avif?v=2"><img src="img/app/review-book.jpg?v=2" alt="Indwell 독후감 화면: 코스모스 1차·2차 독후감" loading="lazy" decoding="async"></picture></div><figcaption>한 권의 책, 여러 번의 독후감</figcaption></figure>
