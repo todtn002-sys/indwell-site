@@ -25,8 +25,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Nanum+Pen+Script&family=Noto+Serif+KR:wght@400;500;600&display=swap">
 <link rel="preload" href="fonts/indwell-title-regular.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="site.css?v=20261024h">
-<script src="site.js?v=20261024h" defer></script>
+<link rel="stylesheet" href="site.css?v=20261024i">
+<script src="site.js?v=20261024i" defer></script>
 <!-- 움직임을 쓸지 정하는 단 한 곳: 기기의 '움직임 줄이기'가 꺼져 있을 때만 .motion을 붙인다.
      그림이 그려지기 전에 정해야 멈춘 화면이 잠깐 보였다 바뀌는 깜빡임이 없다. 나머지 판단은 모두 이 표시를 따른다 -->
 <script>if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('motion');</script>
@@ -120,9 +120,9 @@
   <!-- ── 세 걸음: 처음 보는 사람이 앱의 흐름(지금 적고 → 키우고 → 다시 만난다)을 실제 화면으로 먼저 보게 ── -->
   <section class="steps">
     <div class="wrap phones" data-enter>
-      <figure class="phone"><div class="bezel"><picture><source type="image/avif" srcset="img/app/desk.avif"><img src="img/app/desk.jpg" alt="Indwell 책상 화면: 포스트잇 여섯 장" loading="lazy" decoding="async"></picture></div><figcaption>지금 적고</figcaption></figure>
-      <figure class="phone"><div class="bezel"><picture><source type="image/avif" srcset="img/app/writing.avif"><img src="img/app/writing.jpg" alt="Indwell 작성창 화면" loading="lazy" decoding="async"></picture></div><figcaption>키우고</figcaption></figure>
-      <figure class="phone"><div class="bezel"><picture><source type="image/avif" srcset="img/app/returned-popup.avif"><img src="img/app/returned-popup.jpg" alt="Indwell 돌아온 글 화면" loading="lazy" decoding="async"></picture></div><figcaption>다시 만난다</figcaption></figure>
+      <figure class="phone"><div class="bezel"><picture><source type="image/avif" srcset="img/app/desk.avif?v=2"><img src="img/app/desk.jpg?v=2" alt="Indwell 책상 화면: 포스트잇이 쌓인 책상" loading="lazy" decoding="async"></picture></div><figcaption>지금 적고</figcaption></figure>
+      <figure class="phone"><div class="bezel"><picture><source type="image/avif" srcset="img/app/writing.avif?v=2"><img src="img/app/writing.jpg?v=2" alt="Indwell 작성창 화면" loading="lazy" decoding="async"></picture></div><figcaption>키우고</figcaption></figure>
+      <figure class="phone"><div class="bezel"><picture><source type="image/avif" srcset="img/app/returned-popup.avif?v=2"><img src="img/app/returned-popup.jpg?v=2" alt="Indwell 돌아온 글 화면" loading="lazy" decoding="async"></picture></div><figcaption>다시 만난다</figcaption></figure>
     </div>
   </section>
 
@@ -249,8 +249,8 @@
     </figure>
     </div></div>
     <div class="wrap phones" data-enter>
-      <figure class="phone"><div class="bezel"><picture><source type="image/avif" srcset="img/app/desk.avif"><img src="img/app/desk.jpg" alt="Indwell 책상 화면: 포스트잇 여섯 장" loading="lazy" decoding="async"></picture></div><figcaption>책상</figcaption></figure>
-      <figure class="phone"><div class="bezel"><picture><source type="image/avif" srcset="img/app/writing.avif"><img src="img/app/writing.jpg" alt="Indwell 작성창 화면: 단상 '천천히 성숙하는 것들'" loading="lazy" decoding="async"></picture></div><figcaption>작성창</figcaption></figure>
+      <figure class="phone"><div class="bezel"><picture><source type="image/avif" srcset="img/app/desk.avif?v=2"><img src="img/app/desk.jpg?v=2" alt="Indwell 책상 화면: 포스트잇이 쌓인 책상" loading="lazy" decoding="async"></picture></div><figcaption>책상</figcaption></figure>
+      <figure class="phone"><div class="bezel"><picture><source type="image/avif" srcset="img/app/writing.avif?v=2"><img src="img/app/writing.jpg?v=2" alt="Indwell 작성창 화면: 책 '15초보다 긴 것을 견디는 법' 2장" loading="lazy" decoding="async"></picture></div><figcaption>작성창</figcaption></figure>
     </div>
   </section>
 
@@ -290,7 +290,7 @@
     </figure>
     </div></div>
     <div class="wrap phones" data-enter>
-      <figure class="phone"><div class="bezel"><picture><source type="image/avif" srcset="img/app/library.avif"><img src="img/app/library.jpg" alt="Indwell 내 서재 화면: 생각더미와 책장" loading="lazy" decoding="async"></picture></div><figcaption>내 서재</figcaption></figure>
+      <figure class="phone"><div class="bezel"><picture><source type="image/avif" srcset="img/app/library.avif?v=2"><img src="img/app/library.jpg?v=2" alt="Indwell 내 서재 화면: 생각더미와 책장" loading="lazy" decoding="async"></picture></div><figcaption>내 서재</figcaption></figure>
     </div>
 
     <div class="wrap scene-head" data-enter style="margin-top:96px">
@@ -360,8 +360,7 @@
     </figure>
     </div></div>
     <div class="wrap phones" data-enter>
-      <figure class="phone"><div class="bezel"><picture><source type="image/avif" srcset="img/app/returned-shelf.avif"><img src="img/app/returned-shelf.jpg" alt="Indwell 내 서재: 돌아온 글 표시가 붙은 단상과 책" loading="lazy" decoding="async"></picture></div><figcaption>서재 맨 앞의 돌아온 글</figcaption></figure>
-      <figure class="phone"><div class="bezel"><picture><source type="image/avif" srcset="img/app/returned-popup.avif"><img src="img/app/returned-popup.jpg" alt="Indwell 돌아온 글 창: 190일 전 단상과 41일 전 책" loading="lazy" decoding="async"></picture></div><figcaption>돌아온 글</figcaption></figure>
+      <figure class="phone"><div class="bezel"><picture><source type="image/avif" srcset="img/app/returned-popup.avif?v=2"><img src="img/app/returned-popup.jpg?v=2" alt="Indwell 돌아온 글 창: 49일 전 단상과 182일 전 책" loading="lazy" decoding="async"></picture></div><figcaption>돌아온 글</figcaption></figure>
     </div>
   </section>
 

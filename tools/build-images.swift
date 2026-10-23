@@ -39,7 +39,7 @@ let portrait: [(Int, String)] = [
 let appShots: [(String, String)] = [
   ("01_책상", "desk"), ("02_작성창", "writing"), ("03_서재", "library"),
   ("04a_독후감 목록", "review-list"), ("04b_독후감 데미안 1·2차", "review-book"),
-  ("05a_돌아온 글 (서재)", "returned-shelf"), ("05b_돌아온 글 (팝업)", "returned-popup"),
+  ("05b_돌아온 글 (팝업)", "returned-popup"),
   ("06a_일기장 (돌아온 일기·달력)", "journal-home"), ("06b_일기 쓰기", "journal-entry"),
 ]
 
