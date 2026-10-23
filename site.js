@@ -291,13 +291,13 @@ var inkReady = (function () {
   var bar = document.querySelector('.timebar');
   var links = [].slice.call(bar.querySelectorAll('a'));
   var targets = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
-  var hero = document.querySelector('.hero'), foot = document.querySelector('footer'), night = document.getElementById('s5'), sticky = document.querySelector('.stickybar');
+  var hero = document.querySelector('.hero'), foot = document.querySelector('footer'), night = document.getElementById('s5'), dawn = document.querySelector('.quiet'), sticky = document.querySelector('.stickybar');
   onScroll(function () {
     var vh = innerHeight, cur = -1;
     targets.forEach(function (t, i) { if (t.getBoundingClientRect().top <= vh * .5) cur = i; });
     links.forEach(function (a, i) { if (i === cur) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
     bar.classList.toggle('show', hero.getBoundingClientRect().bottom < vh * .55 && foot.getBoundingClientRect().top > vh - 40);
-    var dark = night.getBoundingClientRect().top < vh * .5;   // 밤 장면 이후: 시간 버튼·메뉴 띠가 함께 바뀐다(판단은 여기 한 곳)
+    var dark = night.getBoundingClientRect().top < vh * .5 && dawn.getBoundingClientRect().top > vh * .5;   // 밤 장면~앱 받기 동안만: 시간 버튼·메뉴 띠가 함께 바뀐다
     bar.classList.toggle('dark', dark);
     sticky.classList.toggle('dark', dark);
   });
@@ -335,7 +335,6 @@ if (MOTION) {
     es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); seen.unobserve(e.target); } });
   }, { threshold: .18 });
   document.querySelectorAll('[data-reveal], [data-enter]').forEach(function (el) { seen.observe(el); });
-  document.querySelector('footer').classList.add('is-night');
   // 첫 화면 종이 위 문장은 손글씨가 종이에 붙은 뒤 한 글자씩 써 내려간다
   inkReady.then(function () { requestAnimationFrame(function () { document.querySelectorAll('[data-ink]').forEach(function (el) { el.classList.add('in'); }); }); });
 }
@@ -373,10 +372,13 @@ if (MOTION) (function () {
 })();
 
 // ── 밤이 내려앉는다: 장면 5(21:00)의 윗변이 화면 아래 85% → 25% 자리로 올라오는 동안 화면 전체가 남색으로 ──
+// 맨 끝 조용한 구역(.quiet, 둘러보기·개인정보·질문)이 같은 식으로 올라오면 다시 오트밀로 걷힌다
 if (MOTION) (function () {
-  var root = document.documentElement, night = document.getElementById('s5');
+  var root = document.documentElement, night = document.getElementById('s5'), dawn = document.querySelector('.quiet');
   onScroll(function () {
-    var o = ease((innerHeight * .85 - night.getBoundingClientRect().top) / (innerHeight * .6));
+    var vh = innerHeight;
+    // 걷힘은 조용한 구역(오트밀 바탕 .quiet)이 화면 위 30% 자리를 지나는 동안 — 경계는 또렷하게 두고 바탕(주소창 뒤 색)만 뒤따라 바뀐다
+    var o = ease((vh * .85 - night.getBoundingClientRect().top) / (vh * .6)) * (1 - ease((vh * .3 - dawn.getBoundingClientRect().top) / (vh * .3)));
     root.style.setProperty('--night-o', Math.round(o * 1000) / 1000);   // 밤 막(.nightfall)과 바탕(body)이 함께 읽는다
   });
 })();

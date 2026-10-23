@@ -195,6 +195,8 @@ html.ov-ready .pasted { visibility: visible; }
 .finale .lead-in { color: #B9AE9C; }
 .finale .gap { display: block; height: .5em; }
 .finale .stores { justify-content: center; }
+.motion .quiet { background: var(--oat); }   /* 밤 막 위에 오트밀을 덮어 밤과의 경계를 또렷하게 */
+.finale .price-note { margin: 22px auto 0; max-width: 34em; font-size: 14px; line-height: 1.8; color: #B9AE9C; }
 .night .store.primary { background: var(--night-ink); border-color: var(--night-ink); color: var(--night); }
 .night .store.soon { color: #B9AE9C; border-color: rgba(237,227,204,.3); }
 
@@ -216,9 +218,6 @@ h2 { font-size: clamp(24px, 5.6vw, 32px); line-height: 1.45; margin-top: 10px; }
 .faq summary::after { content: "＋"; color: var(--ink-dim); }
 .faq details[open] summary::after { content: "－"; }
 .faq details p { margin-top: 10px; color: var(--ink-dim); font-size: 15px; max-width: 34em; }
-/* 맨 끝 조용한 구역(둘러보기·개인정보·질문)은 밤 바탕 위 — 같은 글자색 이름을 밤 색으로 바꿔 끼운다 */
-.quiet { --ink: var(--night-ink); --ink-dim: #B9AE9C; --rule: rgba(237, 227, 204, .16); --gold: #C9A86A; }
-.quiet .gallery img { box-shadow: 0 8px 24px rgba(0, 0, 0, .35); }
 /* 세 걸음: 실제 앱 화면 셋을 한 줄로 작게, 사이에 → */
 .steps { padding-block: 56px 8px; }
 .steps .phones { display: grid; grid-template-columns: repeat(3, minmax(0, 220px)); justify-content: center; gap: 28px; margin-top: 0; }
@@ -356,9 +355,6 @@ html.motion { scroll-behavior: auto; }   /* 부드러운 이동은 site.js가 �
 /* 아이폰 사파리는 아래 주소창 뒤를 고정된 바탕 그림(.paper-bg)의 색으로 칠한다 → 밤에는 종이 결 바탕도 함께 걷어 낸다 */
 .motion .paper-bg { opacity: calc(1 - var(--night-o, 0)); }
 .motion .night { background: transparent; }
-.motion footer.is-night { color: #B9AE9C; border-top-color: rgba(237,227,204,.14); }
-.motion footer.is-night .mail { color: var(--night-ink); }
-.motion footer.is-night .logo { filter: brightness(0) invert(.9) sepia(.25); }
 
 /* ── 하루 시간 단추(레퍼런스의 유리 알약): 첫 화면을 지나면 아래에 떠오른다 ── */
 .timebar { position: fixed; left: 50%; bottom: max(18px, env(safe-area-inset-bottom)); z-index: 25; display: flex; gap: 2px; padding: 5px;

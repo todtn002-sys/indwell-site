@@ -25,8 +25,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Nanum+Pen+Script&family=Noto+Serif+KR:wght@400;500;600&display=swap">
 <link rel="preload" href="fonts/indwell-title-regular.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="site.css?v=20261023w">
-<script src="site.js?v=20261023w" defer></script>
+<link rel="stylesheet" href="site.css?v=20261023y">
+<script src="site.js?v=20261023y" defer></script>
 <!-- 움직임을 쓸지 정하는 단 한 곳: 기기의 '움직임 줄이기'가 꺼져 있을 때만 .motion을 붙인다.
      그림이 그려지기 전에 정해야 멈춘 화면이 잠깐 보였다 바뀌는 깜빡임이 없다. 나머지 판단은 모두 이 표시를 따른다 -->
 <script>if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('motion');</script>
@@ -483,10 +483,11 @@
         <a class="store primary" href="https://apps.apple.com/app/id6810987473" target="_blank" rel="noopener">App Store에서 받기</a>
         <span class="store soon" aria-disabled="true">Google Play · 곧 출시</span>
       </div>
+      <p class="price-note">현재는 초기 버전이므로 무료로 모든 기능을 사용할 수 있습니다.<br>추후에 유료로 전환되어도 초기에 진입하신 분들에 한해서 요금을 부과하지 않을 예정입니다.</p>
     </div>
   </section>
-  <!-- ── 조용한 구역: 둘러보기·개인정보·자주 묻는 질문 — 하루(07:00→23:00)를 다 본 뒤 맨 끝에. 밤 바탕 위라 .quiet로 글자색을 밤에 맞춤 ── -->
-  <section class="shots quiet night">
+  <!-- ── 조용한 구역: 둘러보기·개인정보·자주 묻는 질문 — 하루(07:00→23:00)를 다 본 뒤 맨 끝에. 밤이 지나 다시 오트밀 바탕(site.js 밤 막이 이 구역에서 걷힘) ── -->
+  <section class="shots quiet">
     <div class="wrap">
       <p class="eyebrow">둘러보기</p>
       <h2>책상에서 서재까지</h2>
@@ -504,7 +505,7 @@
     </div>
   </section>
 
-  <section class="quiet night">
+  <section class="quiet">
     <div class="wrap split">
       <div>
         <p class="eyebrow">개인정보</p>
@@ -518,7 +519,7 @@
       </ul>
     </div>
   </section>
-  <section id="faq" class="quiet night">
+  <section id="faq" class="quiet">
     <div class="wrap split">
       <div>
         <p class="eyebrow">자주 묻는 질문</p>
