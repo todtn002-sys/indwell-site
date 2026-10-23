@@ -25,8 +25,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Nanum+Pen+Script&family=Noto+Serif+KR:wght@400;500;600&display=swap">
 <link rel="preload" href="fonts/indwell-title-regular.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="site.css?v=20261024f">
-<script src="site.js?v=20261024f" defer></script>
+<link rel="stylesheet" href="site.css?v=20261024h">
+<script src="site.js?v=20261024h" defer></script>
 <!-- 움직임을 쓸지 정하는 단 한 곳: 기기의 '움직임 줄이기'가 꺼져 있을 때만 .motion을 붙인다.
      그림이 그려지기 전에 정해야 멈춘 화면이 잠깐 보였다 바뀌는 깜빡임이 없다. 나머지 판단은 모두 이 표시를 따른다 -->
 <script>if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('motion');</script>
@@ -467,15 +467,17 @@
     <div class="wrap">
       <p class="eyebrow">둘러보기</p>
       <h2>책상에서 서재까지</h2>
-      <div class="gallery" tabindex="0" aria-label="앱 화면 8장">
-        <img src="img/screen-1.jpg" alt="조용한 책상 화면" loading="lazy">
-        <img src="img/screen-2.jpg" alt="포스트잇이 붙은 책상 화면" loading="lazy">
-        <img src="img/screen-3.jpg" alt="작성창 화면" loading="lazy">
-        <img src="img/screen-4.jpg" alt="포스트잇을 단상이나 책으로 가져가는 과정" loading="lazy">
-        <img src="img/screen-5.jpg" alt="돌아온 글 화면" loading="lazy">
-        <img src="img/screen-6.jpg" alt="글들이 쌓여 책이 되는 과정" loading="lazy">
-        <img src="img/screen-7.jpg" alt="책 상세 화면" loading="lazy">
-        <img src="img/screen-8.jpg" alt="내 서재 화면" loading="lazy">
+      <div class="gallery" tabindex="0" aria-label="앱 소개 화면 10장">
+        <picture><source type="image/avif" srcset="img/posters/poster-1.avif"><img src="img/posters/poster-1.jpg" width="720" height="1558" alt="Indwell 소개 화면 1: 하루 중 너무나 많은 것을 읽지만 정작 내 생각은 남지 않는 시대" loading="lazy" decoding="async"></picture>
+        <picture><source type="image/avif" srcset="img/posters/poster-2.avif"><img src="img/posters/poster-2.jpg" width="720" height="1558" alt="Indwell 소개 화면 2: 생각을 자신의 언어로 붙잡을 공간이 필요합니다" loading="lazy" decoding="async"></picture>
+        <picture><source type="image/avif" srcset="img/posters/poster-3.avif"><img src="img/posters/poster-3.jpg" width="720" height="1558" alt="Indwell 소개 화면 3: 떠오른 생각을 붙잡아 보세요" loading="lazy" decoding="async"></picture>
+        <picture><source type="image/avif" srcset="img/posters/poster-4.avif"><img src="img/posters/poster-4.jpg" width="720" height="1558" alt="Indwell 소개 화면 4: 잊고 있던 생각을 다시 만납니다" loading="lazy" decoding="async"></picture>
+        <picture><source type="image/avif" srcset="img/posters/poster-5.avif"><img src="img/posters/poster-5.jpg" width="720" height="1558" alt="Indwell 소개 화면 5: 무심코 쓴 어느 날의 일기도 되돌아 옵니다" loading="lazy" decoding="async"></picture>
+        <picture><source type="image/avif" srcset="img/posters/poster-6.avif"><img src="img/posters/poster-6.jpg" width="720" height="1558" alt="Indwell 소개 화면 6: 책은 그대로인데 읽는 내가 달라졌습니다" loading="lazy" decoding="async"></picture>
+        <picture><source type="image/avif" srcset="img/posters/poster-7.avif"><img src="img/posters/poster-7.jpg" width="720" height="1558" alt="Indwell 소개 화면 7: 여러분만의 사유 공간" loading="lazy" decoding="async"></picture>
+        <picture><source type="image/avif" srcset="img/posters/poster-8.avif"><img src="img/posters/poster-8.jpg" width="720" height="1558" alt="Indwell 소개 화면 8: 글이 방대해져도 쉽게 찾아갈 수 있습니다" loading="lazy" decoding="async"></picture>
+        <picture><source type="image/avif" srcset="img/posters/poster-9.avif"><img src="img/posters/poster-9.jpg" width="720" height="1558" alt="Indwell 소개 화면 9: 생각이 지나가는 자리, 그리고 남는 자리" loading="lazy" decoding="async"></picture>
+        <picture><source type="image/avif" srcset="img/posters/poster-10.avif"><img src="img/posters/poster-10.jpg" width="720" height="1558" alt="Indwell 소개 화면 10: 세상의 소음으로부터 분리된 나만의 사유 공간, Indwell" loading="lazy" decoding="async"></picture>
       </div>
       <p class="hint">옆으로 넘겨 보세요 →</p>
     </div>

@@ -212,7 +212,8 @@ section { padding-block: 72px; }
 .eyebrow { font-size: 13px; letter-spacing: .14em; color: var(--ink-dim); }
 h2 { font-size: clamp(24px, 5.6vw, 32px); line-height: 1.45; margin-top: 10px; }
 .gallery { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; padding-block: 8px 20px; margin-top: 36px; scrollbar-width: thin; }
-.gallery img { flex: 0 0 auto; width: min(62vw, 240px); aspect-ratio: 9 / 16; object-fit: cover; border-radius: 14px; scroll-snap-align: start; box-shadow: 0 8px 24px rgba(59,42,32,.12); background: var(--card); }
+.gallery picture { flex: 0 0 auto; scroll-snap-align: start; }
+.gallery img { display: block; width: min(62vw, 240px); height: auto; aspect-ratio: 1284 / 2778; object-fit: cover; border-radius: 14px;   /* 앱스토어 포스터 비율 그대로(잘리지 않게) */ box-shadow: 0 8px 24px rgba(59,42,32,.12); background: var(--card); }
 .hint { font-size: 13px; color: var(--ink-dim); margin-top: 4px; }
 .privacy-list { list-style: none; padding: 0; margin: 36px 0 0; display: grid; gap: 0; border-top: 1px solid var(--rule); }
 .privacy-list li { padding-block: 20px; border-bottom: 1px solid var(--rule); display: grid; gap: 4px; }
