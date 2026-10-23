@@ -2,22 +2,22 @@
 // 그림을 바꾸거나 더하면 아래 목록만 고치고 다시 실행한다:
 //   swift tools/build-images.swift
 // 원본 위치(기본값):
-//   GPT 그림   = ~/Downloads/인드웰 웹사이트 그림 재료/GPT가 만든 그림 (여기에 저장)/<번호>.png
-//   실제 앱 화면 = ~/Downloads/인드웰 웹사이트 그림 재료/실제 앱 화면/<이름>.png
+//   GPT 그림   = ~/Downloads/개발./인드웰 웹사이트 그림 재료/GPT가 만든 그림 (여기에 저장)/<번호>.png
+//   실제 앱 화면 = ~/Downloads/개발./인드웰 웹사이트 그림 재료/실제 앱 화면/<이름>.png
 //   표지       = ~/dev/Indwell/src/assets/journal/  (앱 원본, 읽기만 함)
-//   일기 사진   = ~/Downloads/인드웰 웹사이트 그림 재료/일기 사진 (오래앉아 있던 날).png  (일기장에 붙인 사진)
-//               ~/Downloads/인드웰 웹사이트 그림 재료/일기 사진 (우산).png  (1년 전 오늘의 일기 '우산'에 붙인 사진)
+//   일기 사진   = ~/Downloads/개발./인드웰 웹사이트 그림 재료/일기 사진 (오래앉아 있던 날).png  (일기장에 붙인 사진)
+//               ~/Downloads/개발./인드웰 웹사이트 그림 재료/일기 사진 (우산).png  (1년 전 오늘의 일기 '우산'에 붙인 사진)
 import AppKit
 import ImageIO
 import UniformTypeIdentifiers
 
 let home = FileManager.default.homeDirectoryForCurrentUser.path
-let gptDir = "\(home)/Downloads/인드웰 웹사이트 그림 재료/GPT가 만든 그림 (여기에 저장)"
-let appShotDir = "\(home)/Downloads/인드웰 웹사이트 그림 재료/실제 앱 화면"
+let gptDir = "\(home)/Downloads/개발./인드웰 웹사이트 그림 재료/GPT가 만든 그림 (여기에 저장)"
+let appShotDir = "\(home)/Downloads/개발./인드웰 웹사이트 그림 재료/실제 앱 화면"
 let coverDir = "\(home)/dev/Indwell/src/assets/journal"
-let diaryPhoto = "\(home)/Downloads/인드웰 웹사이트 그림 재료/일기 사진 (오래앉아 있던 날).png"
-let umbrellaPhoto = "\(home)/Downloads/인드웰 웹사이트 그림 재료/일기 사진 (우산).png"
-let shelfPhoto = "\(home)/Downloads/인드웰 웹사이트 그림 재료/독후감 책장 (직접 촬영).png"   // 사용자가 직접 찍은 책장(독후감 구역)
+let diaryPhoto = "\(home)/Downloads/개발./인드웰 웹사이트 그림 재료/일기 사진 (오래앉아 있던 날).png"
+let umbrellaPhoto = "\(home)/Downloads/개발./인드웰 웹사이트 그림 재료/일기 사진 (우산).png"
+let shelfPhoto = "\(home)/Downloads/개발./인드웰 웹사이트 그림 재료/독후감 책장 (직접 촬영).png"   // 사용자가 직접 찍은 책장(독후감 구역)
 let site = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().path
 let oat = CGColor(srgbRed: 0xEF / 255.0, green: 0xE3 / 255.0, blue: 0xD6 / 255.0, alpha: 1)  // 바탕색 --oat
 
