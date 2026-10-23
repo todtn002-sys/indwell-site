@@ -25,8 +25,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Nanum+Pen+Script&family=Noto+Serif+KR:wght@400;500;600&display=swap">
 <link rel="preload" href="fonts/indwell-title-regular.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="site.css?v=20261024a">
-<script src="site.js?v=20261024a" defer></script>
+<link rel="stylesheet" href="site.css?v=20261024b">
+<script src="site.js?v=20261024b" defer></script>
 <!-- 움직임을 쓸지 정하는 단 한 곳: 기기의 '움직임 줄이기'가 꺼져 있을 때만 .motion을 붙인다.
      그림이 그려지기 전에 정해야 멈춘 화면이 잠깐 보였다 바뀌는 깜빡임이 없다. 나머지 판단은 모두 이 표시를 따른다 -->
 <script>if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('motion');</script>
@@ -297,6 +297,10 @@
       <p class="time-label">독후감</p>
       <h3 class="scene-title" data-reveal>같은 책, 다른 나</h3>
       <p class="scene-lead">같은 책을 다시 읽으면 그 아래에 2차, 3차 독후감으로 이어 씁니다. 나이가 들며 같은 책에 대한 생각도 달라지기 때문입니다.</p>
+    </div>
+    <!-- 직접 찍은 책장 사진 한 장(겹쳐 바뀌는 장면이 아니라 그냥 놓인 사진) -->
+    <div class="wrap shelf-photo" id="review-shelf" data-enter>
+      <picture><source type="image/avif" srcset="img/scenes/review-shelf-960.avif 960w, img/scenes/review-shelf-1536.avif 1536w" sizes="(min-width: 1100px) 1040px, 100vw"><img src="img/scenes/review-shelf.jpg" width="1536" height="1024" alt="책장에서 책 한 권을 꺼내는 손 — 몰입, 사피엔스, 넥서스, 총균쇠, 자본론이 꽂힌 책장" loading="lazy" decoding="async"></picture>
     </div>
     <div class="seq"><div class="seq-stick">
     <figure class="frame f-review has-p" data-note-y="89">

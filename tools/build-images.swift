@@ -17,6 +17,7 @@ let appShotDir = "\(home)/Downloads/인드웰 웹사이트 그림 재료/실제 
 let coverDir = "\(home)/dev/Indwell/src/assets/journal"
 let diaryPhoto = "\(home)/Downloads/인드웰 웹사이트 그림 재료/일기 사진 (오래앉아 있던 날).png"
 let umbrellaPhoto = "\(home)/Downloads/인드웰 웹사이트 그림 재료/일기 사진 (우산).png"
+let shelfPhoto = "\(home)/Downloads/인드웰 웹사이트 그림 재료/독후감 책장 (직접 촬영).png"   // 사용자가 직접 찍은 책장(독후감 구역)
 let site = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().path
 let oat = CGColor(srgbRed: 0xEF / 255.0, green: 0xE3 / 255.0, blue: 0xD6 / 255.0, alpha: 1)  // 바탕색 --oat
 
@@ -113,5 +114,9 @@ do {
   let umb = load(umbrellaPhoto)
   save(resized(umb, width: 800), "\(scenes)/diary-photo-umbrella.avif", avif, quality: 0.8)
   save(resized(umb, width: 800, flatten: true), "\(scenes)/diary-photo-umbrella.jpg", .jpeg, quality: 0.82)
+  let shelf = load(shelfPhoto)
+  save(resized(shelf, width: 1536), "\(scenes)/review-shelf-1536.avif", avif, quality: 0.82)
+  save(resized(shelf, width: 960), "\(scenes)/review-shelf-960.avif", avif, quality: 0.82)
+  save(resized(shelf, width: 1536, flatten: true), "\(scenes)/review-shelf.jpg", .jpeg, quality: 0.8)
 }
 print("완료: 장면 \(landscape.count + portrait.count) · 앱 화면 \(appShots.count) · 표지 13")
