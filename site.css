@@ -53,30 +53,42 @@ html { scroll-behavior: smooth; scroll-padding-top: 72px; }
 .stickybar .menu a { color: var(--night-ink); }
 .stickybar .menu a:hover { color: #FFFFFF; }
 .stickybar .get { background: var(--oat); color: var(--ink); }
+.stickybar .share { color: var(--night-ink); border-color: rgba(237,227,204,.4); }
+.stickybar .share::after { background: var(--oat); color: var(--ink); }
 /* 밤 장면(남색 바탕)에서는 반대로 밝은 띠 — 밝은 바탕엔 남색, 남색 바탕엔 오트밀(site.js가 시간 버튼과 같은 때 .dark를 붙임) */
 .stickybar { transition: transform .25s ease, visibility .25s, background .5s ease; }
 .stickybar.dark { background: var(--oat); box-shadow: 0 6px 20px rgba(0,0,0,.35); }
 .stickybar.dark .menu a { color: var(--ink-dim); }
 .stickybar.dark .menu a:hover { color: var(--ink); }
 .stickybar.dark .get { background: var(--night); color: var(--night-ink); }
+.stickybar.dark .share { color: var(--ink); border-color: var(--rule); }
+.stickybar.dark .share::after { background: var(--night); color: var(--night-ink); }
 @media (prefers-reduced-motion: reduce) { .stickybar { transition: none; } }
 /* 맨 위 줄. 화면 폭마다 로고 크기를 정해 두어 메뉴와 부딪히지 않게 함:
    600 미만(휴대폰) = 1줄: 로고·앱 받기 / 2줄: 메뉴
    600 이상 = 한 줄: 로고 왼쪽, 메뉴·앱 받기 오른쪽 */
-.topbar .wrap { display: grid; grid-template-columns: auto 1fr auto; grid-template-areas: "brand . get" "menu menu menu"; align-items: center; gap: 14px 24px; padding-block: 20px 0; }
+.topbar .wrap { display: grid; grid-template-columns: auto 1fr auto; grid-template-areas: "brand . actions" "menu menu menu"; align-items: center; gap: 14px 24px; padding-block: 20px 0; }
 .brand { grid-area: brand; margin: 0; line-height: 0; }
 /* 로고 = 같은 줄의 남은 폭을 꽉 채우는 크기(가로:세로 3.485).
    실측(10-10): 메뉴 3개 213(600~820)·233(820 이상), 앱 받기 77, 칸 사이 24×2.
+   공유 아이콘(11-16): 34 + 앱 받기와의 사이 8 = 42를 세 계산식 모두에 더했다.
    계산식의 빼는 값 = 여백 40 + 칸 사이 48 + 메뉴·버튼 폭 + 안전 여유 36(스크롤바·글꼴 차이 대비).
    메뉴 글자나 버튼을 바꾸면 이 숫자도 다시 재야 한다.
    원본 1812×520 — 가장 클 때도 원본보다 작게 표시되어 큰 화면에서 선명 */
-.brand img { height: max(40px, calc((100vw - 201px) / 3.485)); width: auto; }
+.brand img { height: max(40px, calc((100vw - 243px) / 3.485)); width: auto; }
 .nav-right { display: contents; }
 .menu { grid-area: menu; display: flex; justify-content: flex-end; gap: 22px; font-size: 15px; border-top: 1px solid var(--rule); padding-top: 8px; }
-.get { grid-area: get; }
+.actions { grid-area: actions; display: flex; align-items: center; gap: 8px; }
 .menu a { text-decoration: none; color: var(--ink-dim); padding-block: 4px; }
 .menu a:hover { color: var(--ink); }
 .get { white-space: nowrap; text-decoration: none; font-size: 14px; font-weight: 600; color: var(--card); background: var(--ink); padding: 8px 16px; border-radius: 999px; }
+
+/* 링크 공유 아이콘 — 앱 받기 오른쪽 동그라미. 주소를 복사했을 때만 아래에 '링크를 복사했어요'가 잠깐 뜬다(site.js가 .copied를 붙임) */
+.share { position: relative; flex: none; width: 34px; height: 34px; padding: 0; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--rule); background: transparent; color: var(--ink); cursor: pointer; }
+.share svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.share:hover { border-color: currentColor; }
+.share::after { content: '링크를 복사했어요'; position: absolute; top: calc(100% + 8px); right: 0; white-space: nowrap; font-size: 12px; padding: 4px 10px; border-radius: 999px; background: var(--ink); color: var(--card); opacity: 0; pointer-events: none; transition: opacity .2s; }
+.share.copied::after { opacity: 1; }
 
 /* ── 앱 받기 단추 ───────────────────────────────────── */
 .stores { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px; }
@@ -294,14 +306,14 @@ footer .mail { user-select: all; color: var(--ink); }
 }
 
 @media (min-width: 600px) {
-  .topbar .wrap { grid-template-areas: "brand menu get"; }
-  .brand img { height: calc((100vw - 414px) / 3.485); }
+  .topbar .wrap { grid-template-areas: "brand menu actions"; }
+  .brand img { height: calc((100vw - 456px) / 3.485); }
   .menu { justify-content: flex-end; gap: 22px; border-top: 0; padding-top: 0; }
 }
 /* 컴퓨터 화면: 옆으로 펼치기 */
 @media (min-width: 820px) {
   .topbar .wrap { padding-block: 36px 0; }
-  .brand img { height: calc((min(100vw, 1080px) - 434px) / 3.485); }
+  .brand img { height: calc((min(100vw, 1080px) - 476px) / 3.485); }
   .menu { gap: 32px; }
   section, .scene { padding-block: 104px; }
   .split { display: grid; grid-template-columns: 1fr 1.4fr; gap: 64px; align-items: start; }

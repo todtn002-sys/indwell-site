@@ -12,10 +12,28 @@
   function setShown(on) {
     bar.classList.toggle('show', on);
     bar.setAttribute('aria-hidden', on ? 'false' : 'true');
-    bar.querySelectorAll('a').forEach(function (a) { a.tabIndex = on ? 0 : -1; });
+    bar.querySelectorAll('a, button').forEach(function (a) { a.tabIndex = on ? 0 : -1; });
   }
   // 맨 위 메뉴가 띠 높이만큼 밑으로 들어가는 순간 띠가 이어받는다(완전히 사라질 때까지 기다리면 그 사이 빈 줄이 보였다 — 2026-10-23)
   new IntersectionObserver(function (es) { setShown(!es[0].isIntersecting); }, { rootMargin: '-' + bar.offsetHeight + 'px 0px 0px 0px' }).observe(top);
+})();
+
+// ── 링크 공유 ──
+// 맨 위와 따라오는 띠의 공유 아이콘 둘 다. 공유 창이 있는 기기(휴대폰·맥 사파리)는 공유 창을 열고,
+// 없으면 주소를 복사해 '링크를 복사했어요'를 잠깐 보여 준다. 공유하는 주소는 언제나 첫 화면 한 곳.
+// 이 부분은 위 '따라오는 메뉴 띠'보다 뒤에 있어야 복사된 아이콘에도 붙는다.
+(function () {
+  var url = 'https://indwell.kr/';
+  document.querySelectorAll('.share').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (navigator.share) { navigator.share({ title: 'Indwell', url: url }).catch(function () {}); return; }
+      if (!navigator.clipboard) return;
+      navigator.clipboard.writeText(url).then(function () {
+        btn.classList.add('copied');
+        setTimeout(function () { btn.classList.remove('copied'); }, 1800);
+      });
+    });
+  });
 })();
 
 // ── 사용법 창 ──
